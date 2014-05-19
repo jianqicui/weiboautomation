@@ -665,15 +665,6 @@ public class WeiboAutomationAction {
 
 				try {
 					vdiskHandler.addBytes(transferingBlogsDefaultHttpClient,
-							entranceBytes, destEntranceFile);
-				} catch (HandlerException e) {
-					break;
-				}
-
-				sleep();
-
-				try {
-					vdiskHandler.addBytes(transferingBlogsDefaultHttpClient,
 							textBytes, destTextFile);
 				} catch (HandlerException e) {
 					break;
@@ -684,6 +675,15 @@ public class WeiboAutomationAction {
 				try {
 					vdiskHandler.addBytes(transferingBlogsDefaultHttpClient,
 							pictureBytes, destPictureFile);
+				} catch (HandlerException e) {
+					break;
+				}
+
+				sleep();
+
+				try {
+					vdiskHandler.addBytes(transferingBlogsDefaultHttpClient,
+							entranceBytes, destEntranceFile);
 				} catch (HandlerException e) {
 					break;
 				}
@@ -699,16 +699,6 @@ public class WeiboAutomationAction {
 				try {
 					saeStorageHandler.addBytes(
 							transferingBlogsDefaultHttpClient, saeStorage,
-							entranceBytes, destEntranceFile);
-				} catch (HandlerException e) {
-					break;
-				}
-
-				sleep();
-
-				try {
-					saeStorageHandler.addBytes(
-							transferingBlogsDefaultHttpClient, saeStorage,
 							textBytes, destTextFile);
 				} catch (HandlerException e) {
 					break;
@@ -720,6 +710,16 @@ public class WeiboAutomationAction {
 					saeStorageHandler.addBytes(
 							transferingBlogsDefaultHttpClient, saeStorage,
 							pictureBytes, destPictureFile);
+				} catch (HandlerException e) {
+					break;
+				}
+
+				sleep();
+
+				try {
+					saeStorageHandler.addBytes(
+							transferingBlogsDefaultHttpClient, saeStorage,
+							entranceBytes, destEntranceFile);
 				} catch (HandlerException e) {
 					break;
 				}

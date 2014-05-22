@@ -1059,7 +1059,7 @@ public class WeiboAutomationAction {
 
 				try {
 					userList = userService.getUserList(UserPhase.filtered,
-							followingUserIndex, followingUserSize);
+							followingUserIndex, 200);
 				} catch (ServiceException e) {
 					logger.error("Exception", e);
 
@@ -1077,7 +1077,50 @@ public class WeiboAutomationAction {
 
 				sleep();
 
-				int userSize = userList.size();
+				String accessToken;
+
+				try {
+					accessToken = weiboApiHandler
+							.getAccessToken(followingUsersDefaultHttpClient);
+				} catch (HandlerException e) {
+					continue;
+				}
+
+				sleep();
+
+				Map<String, Integer> blogSizeMap;
+
+				try {
+					blogSizeMap = weiboApiHandler.getBlogSizeMapByUserList(
+							followingUsersDefaultHttpClient, accessToken,
+							userList);
+				} catch (HandlerException e) {
+					continue;
+				}
+
+				sleep();
+
+				List<User> vUserList = new ArrayList<User>();
+
+				for (int i = 0; i < userList.size(); i++) {
+					User user = userList.get(i);
+
+					String userSn = user.getSn();
+
+					int blogSize = blogSizeMap.get(userSn);
+
+					if (blogSize >= 5) {
+						vUserList.add(user);
+					}
+
+					followingUserIndex++;
+
+					if (vUserList.size() == followingUserSize) {
+						break;
+					}
+				}
+
+				int userSize = vUserList.size();
 
 				logger.debug(
 						"Begin to follow users, typeCode = {}, followingUserCode = {}, userSize = {}",
@@ -1085,7 +1128,7 @@ public class WeiboAutomationAction {
 
 				userSize = 0;
 
-				for (User user : userList) {
+				for (User user : vUserList) {
 					String userSn = user.getSn();
 
 					try {
@@ -1112,8 +1155,6 @@ public class WeiboAutomationAction {
 				logger.debug(
 						"End to follow users, typeCode = {}, followingUserCode = {}, userSize = {}",
 						typeCode, followingUserCode, userSize);
-
-				followingUserIndex = followingUserIndex + followingUserSize;
 
 				followingUser.setUserIndex(followingUserIndex);
 

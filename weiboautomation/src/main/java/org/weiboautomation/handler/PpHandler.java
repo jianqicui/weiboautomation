@@ -175,7 +175,7 @@ public class PpHandler {
 			try {
 				Thread.sleep(10000);
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+				throw new HandlerException(e);
 			}
 		}
 

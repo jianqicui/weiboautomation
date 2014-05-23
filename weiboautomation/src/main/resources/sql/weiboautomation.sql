@@ -65,3 +65,11 @@ create table user_filtered (
 	sn varchar(20) not null,
 	primary key (id)
 );
+
+create table user_following (
+	id int not null auto_increment,
+	code int not null,
+  	cookies text not null,
+  	user_index int not null,
+  	primary key (id)
+);

@@ -21,10 +21,8 @@ public class FollowingUserJdbcDaoTest {
 
 	@Test
 	public void testGetFollowingUserList() throws DaoException {
-		int typeCode = 1;
-
 		List<FollowingUser> followingUserList = followingUserDao
-				.getFollowingUserList(typeCode);
+				.getFollowingUserList();
 
 		Assert.assertNotNull(followingUserList);
 	}

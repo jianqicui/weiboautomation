@@ -37,15 +37,9 @@ public class FollowingUserJdbcDao implements FollowingUserDao {
 
 	}
 
-	private String getTableName(int typeCode) {
-		return "type" + typeCode + "_user_following";
-	}
-
 	@Override
-	public List<FollowingUser> getFollowingUserList(int typeCode)
-			throws DaoException {
-		String sql = "select id, code, cookies, user_index from "
-				+ getTableName(typeCode) + " order by id";
+	public List<FollowingUser> getFollowingUserList() throws DaoException {
+		String sql = "select id, code, cookies, user_index from user_following order by id";
 
 		try {
 			return jdbcTemplate.query(sql, rowMapper);
@@ -55,10 +49,9 @@ public class FollowingUserJdbcDao implements FollowingUserDao {
 	}
 
 	@Override
-	public void updateFollowingUser(int typeCode, FollowingUser followingUser)
+	public void updateFollowingUser(FollowingUser followingUser)
 			throws DaoException {
-		String sql = "update " + getTableName(typeCode)
-				+ " set code = ?, cookies = ?, user_index = ? where id = ?";
+		String sql = "update user_following set code = ?, cookies = ?, user_index = ? where id = ?";
 
 		try {
 			jdbcTemplate.update(sql, followingUser.getCode(),

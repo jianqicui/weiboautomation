@@ -249,7 +249,7 @@
 		</property>
 		<property name="followingUserService" ref="followingUserService" />
 		<property name="followingUserSize">
-			<value>20</value>
+			<value>25</value>
 		</property>
 		<property name="followedUserService" ref="followedUserService" />
 		<property name="reservingFollowedDays">

@@ -19,13 +19,6 @@ public class FollowedUserJdbcDao implements FollowedUserDao {
 		this.jdbcTemplate = jdbcTemplate;
 	}
 
-	private String getTableName(int typeCode, int followingUserCode) {
-		String tableName = "type" + typeCode + "_user" + followingUserCode
-				+ "_followed";
-
-		return tableName;
-	}
-
 	private RowMapper<User> rowMapper = new UserRowMapper();
 
 	private class UserRowMapper implements RowMapper<User> {
@@ -42,10 +35,15 @@ public class FollowedUserJdbcDao implements FollowedUserDao {
 
 	}
 
+	private String getTableName(int followingUserCode) {
+		String tableName = "user" + followingUserCode + "_followed";
+
+		return tableName;
+	}
+
 	@Override
-	public void addUser(int typeCode, int followingUserCode, User user)
-			throws DaoException {
-		String sql = "insert into " + getTableName(typeCode, followingUserCode)
+	public void addUser(int followingUserCode, User user) throws DaoException {
+		String sql = "insert into " + getTableName(followingUserCode)
 				+ " (sn, created_timestamp) values (?, ?)";
 
 		try {
@@ -56,10 +54,9 @@ public class FollowedUserJdbcDao implements FollowedUserDao {
 	}
 
 	@Override
-	public List<User> getUserListBeforeDays(int typeCode,
-			int followingUserCode, int days) throws DaoException {
-		String sql = "select id, sn from "
-				+ getTableName(typeCode, followingUserCode)
+	public List<User> getUserListBeforeDays(int followingUserCode, int days)
+			throws DaoException {
+		String sql = "select id, sn from " + getTableName(followingUserCode)
 				+ " where datediff(now(), created_timestamp) >= ?  order by id";
 
 		try {
@@ -70,9 +67,8 @@ public class FollowedUserJdbcDao implements FollowedUserDao {
 	}
 
 	@Override
-	public void deleteUser(int typeCode, int followingUserCode, int id)
-			throws DaoException {
-		String sql = "delete from " + getTableName(typeCode, followingUserCode)
+	public void deleteUser(int followingUserCode, int id) throws DaoException {
+		String sql = "delete from " + getTableName(followingUserCode)
 				+ " where id = ?";
 
 		try {

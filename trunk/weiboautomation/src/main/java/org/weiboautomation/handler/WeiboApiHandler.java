@@ -65,7 +65,7 @@ public class WeiboApiHandler {
 		return accessToken;
 	}
 
-	public List<User> getUserListByUserSn(HttpClient httpClient,
+	public List<User> getFollowedUserListByUserSn(HttpClient httpClient,
 			String accessToken, String userSn, int cursor, int size)
 			throws HandlerException {
 		byte[] result;

@@ -842,7 +842,7 @@ public class WeiboAutomationAction {
 		}
 	}
 
-	private List<User> getUserListByUserSn(HttpClient httpClient,
+	private List<User> getFollowedUserListByUserSn(HttpClient httpClient,
 			String accessToken, String userSn) {
 		List<User> userList = new ArrayList<User>();
 
@@ -853,8 +853,8 @@ public class WeiboAutomationAction {
 			List<User> vUserList;
 
 			try {
-				vUserList = weiboApiHandler.getUserListByUserSn(httpClient,
-						accessToken, userSn, cursor, size);
+				vUserList = weiboApiHandler.getFollowedUserListByUserSn(
+						httpClient, accessToken, userSn, cursor, size);
 			} catch (HandlerException e) {
 				vUserList = new ArrayList<User>();
 			}
@@ -932,7 +932,7 @@ public class WeiboAutomationAction {
 		for (CollectingUser collectingUser : collectingUserList) {
 			String userSn = collectingUser.getSn();
 
-			List<User> vUserList = getUserListByUserSn(
+			List<User> vUserList = getFollowedUserListByUserSn(
 					collectingUsersDefaultHttpClient, accessToken, userSn);
 
 			userList.addAll(vUserList);

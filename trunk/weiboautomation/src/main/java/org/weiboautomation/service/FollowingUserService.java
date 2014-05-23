@@ -7,10 +7,9 @@ import org.weiboautomation.service.exception.ServiceException;
 
 public interface FollowingUserService {
 
-	List<FollowingUser> getFollowingUserList(int typeCode)
-			throws ServiceException;
+	List<FollowingUser> getFollowingUserList() throws ServiceException;
 
-	void updateFollowingUser(int typeCode, FollowingUser followingUser)
+	void updateFollowingUser(FollowingUser followingUser)
 			throws ServiceException;
 
 }

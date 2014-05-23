@@ -19,11 +19,3 @@ create table type2_user_publishing (
   	cookies text not null,
   	primary key (id)
 );
-
-create table type2_user_following (
-	id int not null auto_increment,
-	code int not null,
-  	cookies text not null,
-  	user_index int not null,
-  	primary key (id)
-);

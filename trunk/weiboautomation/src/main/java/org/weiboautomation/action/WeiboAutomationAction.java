@@ -1027,249 +1027,215 @@ public class WeiboAutomationAction {
 	}
 
 	private void followUsers() {
-		List<Type> typeList;
+		List<FollowingUser> followingUserList;
 
 		try {
-			typeList = typeService.getTypeList();
+			followingUserList = followingUserService.getFollowingUserList();
 		} catch (ServiceException e) {
 			logger.error("Exception", e);
 
 			throw new ActionException(e);
 		}
 
-		for (Type type : typeList) {
-			int typeCode = type.getCode();
+		for (FollowingUser followingUser : followingUserList) {
+			int followingUserCode = followingUser.getCode();
+			int followingUserIndex = followingUser.getUserIndex();
 
-			List<FollowingUser> followingUserList;
+			List<User> userList;
 
 			try {
-				followingUserList = followingUserService
-						.getFollowingUserList(typeCode);
+				userList = userService.getUserList(UserPhase.filtered,
+						followingUserIndex, 200);
 			} catch (ServiceException e) {
 				logger.error("Exception", e);
 
 				throw new ActionException(e);
 			}
 
-			for (FollowingUser followingUser : followingUserList) {
-				int followingUserCode = followingUser.getCode();
-				int followingUserIndex = followingUser.getUserIndex();
+			setCookies(followingUsersDefaultHttpClient,
+					followingUser.getCookies());
 
-				List<User> userList;
+			try {
+				weiboHandler.refresh(followingUsersDefaultHttpClient);
+			} catch (HandlerException e) {
+				continue;
+			}
+
+			sleep();
+
+			String accessToken;
+
+			try {
+				accessToken = weiboApiHandler
+						.getAccessToken(followingUsersDefaultHttpClient);
+			} catch (HandlerException e) {
+				continue;
+			}
+
+			sleep();
+
+			Map<String, Integer> blogSizeMap;
+
+			try {
+				blogSizeMap = weiboApiHandler.getBlogSizeMapByUserList(
+						followingUsersDefaultHttpClient, accessToken, userList);
+			} catch (HandlerException e) {
+				continue;
+			}
+
+			sleep();
+
+			List<User> vUserList = new ArrayList<User>();
+
+			for (int i = 0; i < userList.size(); i++) {
+				User user = userList.get(i);
+
+				String userSn = user.getSn();
+
+				int blogSize = blogSizeMap.get(userSn);
+
+				if (blogSize >= 5) {
+					vUserList.add(user);
+				}
+
+				followingUserIndex++;
+
+				if (vUserList.size() == followingUserSize) {
+					break;
+				}
+			}
+
+			int userSize = vUserList.size();
+
+			logger.debug(
+					"Begin to follow users, followingUserCode = {}, userSize = {}",
+					followingUserCode, userSize);
+
+			userSize = 0;
+
+			for (User user : vUserList) {
+				String userSn = user.getSn();
 
 				try {
-					userList = userService.getUserList(UserPhase.filtered,
-							followingUserIndex, 200);
+					weiboHandler
+							.follow(followingUsersDefaultHttpClient, userSn);
+
+					userSize++;
+				} catch (HandlerException e) {
+
+				}
+
+				sleep();
+
+				try {
+					followedUserService.addUser(followingUserCode, user);
 				} catch (ServiceException e) {
 					logger.error("Exception", e);
 
 					throw new ActionException(e);
 				}
+			}
 
-				setCookies(followingUsersDefaultHttpClient,
-						followingUser.getCookies());
+			logger.debug(
+					"End to follow users, followingUserCode = {}, userSize = {}",
+					followingUserCode, userSize);
 
-				try {
-					weiboHandler.refresh(followingUsersDefaultHttpClient);
-				} catch (HandlerException e) {
-					continue;
-				}
+			followingUser.setUserIndex(followingUserIndex);
 
-				sleep();
+			followingUser
+					.setCookies(getCookies(followingUsersDefaultHttpClient));
 
-				String accessToken;
+			try {
+				followingUserService.updateFollowingUser(followingUser);
+			} catch (ServiceException e) {
+				logger.error("Exception", e);
 
-				try {
-					accessToken = weiboApiHandler
-							.getAccessToken(followingUsersDefaultHttpClient);
-				} catch (HandlerException e) {
-					continue;
-				}
-
-				sleep();
-
-				Map<String, Integer> blogSizeMap;
-
-				try {
-					blogSizeMap = weiboApiHandler.getBlogSizeMapByUserList(
-							followingUsersDefaultHttpClient, accessToken,
-							userList);
-				} catch (HandlerException e) {
-					continue;
-				}
-
-				sleep();
-
-				List<User> vUserList = new ArrayList<User>();
-
-				for (int i = 0; i < userList.size(); i++) {
-					User user = userList.get(i);
-
-					String userSn = user.getSn();
-
-					int blogSize = blogSizeMap.get(userSn);
-
-					if (blogSize >= 5) {
-						vUserList.add(user);
-					}
-
-					followingUserIndex++;
-
-					if (vUserList.size() == followingUserSize) {
-						break;
-					}
-				}
-
-				int userSize = vUserList.size();
-
-				logger.debug(
-						"Begin to follow users, typeCode = {}, followingUserCode = {}, userSize = {}",
-						typeCode, followingUserCode, userSize);
-
-				userSize = 0;
-
-				for (User user : vUserList) {
-					String userSn = user.getSn();
-
-					try {
-						weiboHandler.follow(followingUsersDefaultHttpClient,
-								userSn);
-
-						userSize++;
-					} catch (HandlerException e) {
-
-					}
-
-					sleep();
-
-					try {
-						followedUserService.addUser(typeCode,
-								followingUserCode, user);
-					} catch (ServiceException e) {
-						logger.error("Exception", e);
-
-						throw new ActionException(e);
-					}
-				}
-
-				logger.debug(
-						"End to follow users, typeCode = {}, followingUserCode = {}, userSize = {}",
-						typeCode, followingUserCode, userSize);
-
-				followingUser.setUserIndex(followingUserIndex);
-
-				followingUser
-						.setCookies(getCookies(followingUsersDefaultHttpClient));
-
-				try {
-					followingUserService.updateFollowingUser(typeCode,
-							followingUser);
-				} catch (ServiceException e) {
-					logger.error("Exception", e);
-
-					throw new ActionException(e);
-				}
+				throw new ActionException(e);
 			}
 		}
 	}
 
 	private void unfollowUsers() {
-		List<Type> typeList;
+		List<FollowingUser> followingUserList;
 
 		try {
-			typeList = typeService.getTypeList();
+			followingUserList = followingUserService.getFollowingUserList();
 		} catch (ServiceException e) {
 			logger.error("Exception", e);
 
 			throw new ActionException(e);
 		}
 
-		for (Type type : typeList) {
-			int typeCode = type.getCode();
+		for (FollowingUser followingUser : followingUserList) {
+			int followingUserCode = followingUser.getCode();
 
-			List<FollowingUser> followingUserList;
+			List<User> userList;
 
 			try {
-				followingUserList = followingUserService
-						.getFollowingUserList(typeCode);
+				userList = followedUserService.getUserListBeforeDays(
+						followingUserCode, reservingFollowedDays);
 			} catch (ServiceException e) {
 				logger.error("Exception", e);
 
 				throw new ActionException(e);
 			}
 
-			for (FollowingUser followingUser : followingUserList) {
-				int followingUserCode = followingUser.getCode();
+			setCookies(unfollowingUsersDefaultHttpClient,
+					followingUser.getCookies());
 
-				List<User> userList;
+			try {
+				weiboHandler.refresh(unfollowingUsersDefaultHttpClient);
+			} catch (HandlerException e) {
+				continue;
+			}
+
+			sleep();
+
+			int userSize = userList.size();
+
+			logger.debug(
+					"Begin to unfollow users, followingUserCode = {}, userSize = {}",
+					followingUserCode, userSize);
+
+			userSize = 0;
+
+			for (User user : userList) {
+				String userSn = user.getSn();
 
 				try {
-					userList = followedUserService.getUserListBeforeDays(
-							typeCode, followingUserCode, reservingFollowedDays);
-				} catch (ServiceException e) {
-					logger.error("Exception", e);
+					weiboHandler.unfollow(unfollowingUsersDefaultHttpClient,
+							userSn);
 
-					throw new ActionException(e);
-				}
-
-				setCookies(unfollowingUsersDefaultHttpClient,
-						followingUser.getCookies());
-
-				try {
-					weiboHandler.refresh(unfollowingUsersDefaultHttpClient);
+					userSize++;
 				} catch (HandlerException e) {
-					continue;
+
 				}
 
 				sleep();
 
-				int userSize = userList.size();
-
-				logger.debug(
-						"Begin to unfollow users, typeCode = {}, followingUserCode = {}, userSize = {}",
-						typeCode, followingUserCode, userSize);
-
-				userSize = 0;
-
-				for (User user : userList) {
-					String userSn = user.getSn();
-
-					try {
-						weiboHandler.unfollow(
-								unfollowingUsersDefaultHttpClient, userSn);
-
-						userSize++;
-					} catch (HandlerException e) {
-
-					}
-
-					sleep();
-
-					try {
-						followedUserService.deleteUser(typeCode,
-								followingUserCode, user.getId());
-					} catch (ServiceException e) {
-						logger.error("Exception", e);
-
-						throw new ActionException(e);
-					}
-				}
-
-				logger.debug(
-						"End to unfollow users, typeCode = {}, followingUserCode = {}, userSize = {}",
-						typeCode, followingUserCode, userSize);
-
-				followingUser
-						.setCookies(getCookies(unfollowingUsersDefaultHttpClient));
-
 				try {
-					followingUserService.updateFollowingUser(typeCode,
-							followingUser);
+					followedUserService.deleteUser(followingUserCode,
+							user.getId());
 				} catch (ServiceException e) {
 					logger.error("Exception", e);
 
 					throw new ActionException(e);
 				}
+			}
+
+			logger.debug(
+					"End to unfollow users, followingUserCode = {}, userSize = {}",
+					followingUserCode, userSize);
+
+			followingUser
+					.setCookies(getCookies(unfollowingUsersDefaultHttpClient));
+
+			try {
+				followingUserService.updateFollowingUser(followingUser);
+			} catch (ServiceException e) {
+				logger.error("Exception", e);
+
+				throw new ActionException(e);
 			}
 		}
 	}

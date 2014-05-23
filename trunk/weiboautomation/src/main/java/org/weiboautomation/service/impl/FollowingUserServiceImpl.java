@@ -17,20 +17,19 @@ public class FollowingUserServiceImpl implements FollowingUserService {
 	}
 
 	@Override
-	public List<FollowingUser> getFollowingUserList(int typeCode)
-			throws ServiceException {
+	public List<FollowingUser> getFollowingUserList() throws ServiceException {
 		try {
-			return followingUserDao.getFollowingUserList(typeCode);
+			return followingUserDao.getFollowingUserList();
 		} catch (DaoException e) {
 			throw new ServiceException(e);
 		}
 	}
 
 	@Override
-	public void updateFollowingUser(int typeCode, FollowingUser followingUser)
+	public void updateFollowingUser(FollowingUser followingUser)
 			throws ServiceException {
 		try {
-			followingUserDao.updateFollowingUser(typeCode, followingUser);
+			followingUserDao.updateFollowingUser(followingUser);
 		} catch (DaoException e) {
 			throw new ServiceException(e);
 		}

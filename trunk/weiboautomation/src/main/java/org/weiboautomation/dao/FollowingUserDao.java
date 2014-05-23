@@ -7,9 +7,9 @@ import org.weiboautomation.entity.FollowingUser;
 
 public interface FollowingUserDao {
 
-	List<FollowingUser> getFollowingUserList(int typeCode) throws DaoException;
+	List<FollowingUser> getFollowingUserList() throws DaoException;
 
-	void updateFollowingUser(int typeCode, FollowingUser followingUser)
+	void updateFollowingUser(FollowingUser followingUser)
 			throws DaoException;
 
 }

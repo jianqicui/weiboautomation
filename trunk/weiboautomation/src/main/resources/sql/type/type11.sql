@@ -20,10 +20,3 @@ create table type11_user_publishing (
   	primary key (id)
 );
 
-create table type11_user_following (
-	id int not null auto_increment,
-	code int not null,
-  	cookies text not null,
-  	user_index int not null,
-  	primary key (id)
-);

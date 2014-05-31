@@ -1,10 +1,10 @@
 package org.weiboautomation.handler;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.io.Charsets;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -68,13 +68,8 @@ public class SaeAppBatchhelperHandler {
 		nameValuePairList.add(new BasicNameValuePair("picturePath", blog
 				.getPicture()));
 
-		HttpEntity httpEntity;
-
-		try {
-			httpEntity = new UrlEncodedFormEntity(nameValuePairList, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			throw new HandlerException(e);
-		}
+		HttpEntity httpEntity = new UrlEncodedFormEntity(nameValuePairList,
+				Charsets.UTF_8);
 
 		publishEntity(httpClient, httpEntity);
 	}

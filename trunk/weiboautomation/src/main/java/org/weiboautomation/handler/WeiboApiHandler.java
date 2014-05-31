@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.io.Charsets;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -43,7 +44,7 @@ public class WeiboApiHandler {
 		try {
 			HttpResponse response = httpClient.execute(get);
 
-			html = EntityUtils.toString(response.getEntity(), "UTF-8");
+			html = EntityUtils.toString(response.getEntity(), Charsets.UTF_8);
 		} catch (ClientProtocolException e) {
 			throw new HandlerException(e);
 		} catch (IOException e) {

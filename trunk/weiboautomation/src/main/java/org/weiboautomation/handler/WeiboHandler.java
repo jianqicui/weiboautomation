@@ -1,7 +1,6 @@
 package org.weiboautomation.handler;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -173,7 +172,7 @@ public class WeiboHandler {
 			loginWeibo(httpClient, query);
 		}
 	}
-	
+
 	private byte[] post(HttpClient httpClient, HttpPost post)
 			throws HandlerException {
 		byte[] result;
@@ -198,7 +197,7 @@ public class WeiboHandler {
 
 		return result;
 	}
-	
+
 	private void analyzeResult(byte[] result) throws HandlerException {
 		JsonNode jsonNode;
 
@@ -216,7 +215,7 @@ public class WeiboHandler {
 			throw new HandlerException(code);
 		}
 	}
-	
+
 	public void follow(HttpClient httpClient, String userSn)
 			throws HandlerException {
 		HttpPost post = new HttpPost("http://www.weibo.com/aj/f/followed");
@@ -227,11 +226,8 @@ public class WeiboHandler {
 
 		nameValuePairList.add(new BasicNameValuePair("uid", userSn));
 
-		try {
-			post.setEntity(new UrlEncodedFormEntity(nameValuePairList));
-		} catch (UnsupportedEncodingException e) {
-			throw new HandlerException(e);
-		}
+		post.setEntity(new UrlEncodedFormEntity(nameValuePairList,
+				Charsets.UTF_8));
 
 		byte[] result = post(httpClient, post);
 
@@ -248,11 +244,8 @@ public class WeiboHandler {
 
 		nameValuePairList.add(new BasicNameValuePair("uid", userSn));
 
-		try {
-			post.setEntity(new UrlEncodedFormEntity(nameValuePairList));
-		} catch (UnsupportedEncodingException e) {
-			throw new HandlerException(e);
-		}
+		post.setEntity(new UrlEncodedFormEntity(nameValuePairList,
+				Charsets.UTF_8));
 
 		byte[] result = post(httpClient, post);
 

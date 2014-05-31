@@ -1,7 +1,6 @@
 package org.weiboautomation.handler;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,9 +37,10 @@ public class VdiskHandler {
 		nameValuePairList.add(new BasicNameValuePair("http_response_code",
 				"200"));
 
-		try {
-			post.setEntity(new UrlEncodedFormEntity(nameValuePairList));
+		post.setEntity(new UrlEncodedFormEntity(nameValuePairList,
+				Charsets.UTF_8));
 
+		try {
 			HttpResponse response = httpClient.execute(post);
 
 			int statusCode = response.getStatusLine().getStatusCode();
@@ -51,8 +51,6 @@ public class VdiskHandler {
 			} else {
 				throw new HandlerException(String.valueOf(statusCode));
 			}
-		} catch (UnsupportedEncodingException e) {
-			throw new HandlerException(e);
 		} catch (ClientProtocolException e) {
 			throw new HandlerException(e);
 		} catch (IOException e) {

@@ -25,6 +25,7 @@ import javax.crypto.NoSuchPaddingException;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.io.Charsets;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -45,12 +46,12 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 public class WeiboLoginTest {
 
 	private ObjectMapper objectMapper;
-	
+
 	private DefaultHttpClient defaultHttpClient;
 
 	public WeiboLoginTest() {
 		objectMapper = new ObjectMapper();
-		
+
 		defaultHttpClient = new DefaultHttpClient();
 	}
 
@@ -222,7 +223,7 @@ public class WeiboLoginTest {
 		url.append("&");
 		url.append("encoding");
 		url.append("=");
-		url.append("UTF-8");
+		url.append(Charsets.UTF_8.toString());
 		url.append("&");
 		url.append("callback");
 		url.append("=");
@@ -377,25 +378,20 @@ public class WeiboLoginTest {
 		byte[] result;
 
 		JsonNode jsonNode;
-		
+
 		String su = null;
 
 		try {
-			su = Base64.encodeBase64String(URLEncoder.encode(username, "UTF-8")
-					.getBytes());
+			su = Base64.encodeBase64String(URLEncoder.encode(username,
+					Charsets.UTF_8.toString()).getBytes());
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
 
 		// prelogin
 		result = prelogin(su);
-		String preloginResult = null;
 
-		try {
-			preloginResult = new String(result, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
+		String preloginResult = new String(result, Charsets.UTF_8);
 
 		System.out.println(String
 				.format("Prelogin result = %s", preloginResult));
@@ -414,13 +410,8 @@ public class WeiboLoginTest {
 
 		// loginSina
 		result = loginSina(su, servertime, nonce, rsakv, sp, prelt);
-		String loginSinaResult = null;
 
-		try {
-			loginSinaResult = new String(result, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
+		String loginSinaResult = new String(result, Charsets.UTF_8);
 
 		System.out.println(String.format("LoginSina result = %s",
 				loginSinaResult));
@@ -431,13 +422,8 @@ public class WeiboLoginTest {
 
 		// loginWeibo
 		result = loginWeibo(ticket);
-		String loginWeiboResult = null;
 
-		try {
-			loginWeiboResult = new String(result, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
+		String loginWeiboResult = new String(result, Charsets.UTF_8);
 
 		System.out.println(String.format("LoginWeibo result = %s",
 				loginWeiboResult));
@@ -472,26 +458,16 @@ public class WeiboLoginTest {
 
 		// validatePinCode
 		result = validatePinCode(pcid, pinCode);
-		String validatePinCodeResult = null;
 
-		try {
-			validatePinCodeResult = new String(result, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
+		String validatePinCodeResult = new String(result, Charsets.UTF_8);
 
 		System.out.println(String.format("ValidatePinCode result = %s",
 				validatePinCodeResult));
 
 		// crossDomain
 		result = crossDomain();
-		String crossDomainResult = null;
 
-		try {
-			crossDomainResult = new String(result, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
+		String crossDomainResult = new String(result, Charsets.UTF_8);
 
 		System.out.println(String.format("CrossDomain result = %s",
 				crossDomainResult));
@@ -512,13 +488,8 @@ public class WeiboLoginTest {
 
 		// loginWeibo2
 		result = loginWeibo2(query);
-		String loginWeibo2Result = null;
 
-		try {
-			loginWeibo2Result = new String(result, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
+		String loginWeibo2Result = new String(result, Charsets.UTF_8);
 
 		System.out.println(String.format("LoginWeibo2 result = %s",
 				loginWeibo2Result));

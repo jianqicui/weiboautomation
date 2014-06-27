@@ -844,27 +844,19 @@ public class WeiboAutomationAction {
 
 	private List<User> getFollowedUserListByUserSn(HttpClient httpClient,
 			String accessToken, String userSn) {
-		List<User> userList = new ArrayList<User>();
+		List<User> userList;
 
 		int cursor = 0;
-		int size = 100;
+		int size = 5000;
 
-		for (int i = 0; i < 50; i++) {
-			List<User> vUserList;
-
-			try {
-				vUserList = weiboApiHandler.getFollowedUserListByUserSn(
-						httpClient, accessToken, userSn, cursor, size);
-			} catch (HandlerException e) {
-				vUserList = new ArrayList<User>();
-			}
-
-			sleep();
-
-			userList.addAll(vUserList);
-
-			cursor = cursor + size;
+		try {
+			userList = weiboApiHandler.getFollowedUserListByUserSn(httpClient,
+					accessToken, userSn, cursor, size);
+		} catch (HandlerException e) {
+			userList = new ArrayList<User>();
 		}
+
+		sleep();
 
 		return userList;
 	}

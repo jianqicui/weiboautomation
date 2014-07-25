@@ -7,6 +7,9 @@ import org.weiboautomation.entity.Blog;
 
 public interface BlogDao {
 
+	List<Blog> getDescendingBlogList(int typeCode, int index, int size)
+			throws DaoException;
+
 	void addBlog(int typeCode, Blog blog) throws DaoException;
 
 	List<Blog> getBlogList(int typeCode, int index, int size)

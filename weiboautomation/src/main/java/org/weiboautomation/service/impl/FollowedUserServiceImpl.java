@@ -28,11 +28,11 @@ public class FollowedUserServiceImpl implements FollowedUserService {
 	}
 
 	@Override
-	public List<User> getUserListBeforeDays(int followingUserCode, int days)
-			throws ServiceException {
+	public List<User> getUserListBeforeDays(int followingUserCode, int days,
+			int index, int size) throws ServiceException {
 		try {
 			return followedUserDao.getUserListBeforeDays(followingUserCode,
-					days);
+					days, index, size);
 		} catch (DaoException e) {
 			throw new ServiceException(e);
 		}
@@ -43,6 +43,39 @@ public class FollowedUserServiceImpl implements FollowedUserService {
 			throws ServiceException {
 		try {
 			followedUserDao.deleteUser(followingUserCode, id);
+		} catch (DaoException e) {
+			throw new ServiceException(e);
+		}
+	}
+
+	@Override
+	public void addUser(int typeCode, int followingUserCode, User user)
+			throws ServiceException {
+		try {
+			followedUserDao.addUser(typeCode, followingUserCode, user);
+		} catch (DaoException e) {
+			throw new ServiceException(e);
+		}
+
+	}
+
+	@Override
+	public List<User> getUserListBeforeDays(int typeCode,
+			int followingUserCode, int days, int index, int size)
+			throws ServiceException {
+		try {
+			return followedUserDao.getUserListBeforeDays(typeCode,
+					followingUserCode, days, index, size);
+		} catch (DaoException e) {
+			throw new ServiceException(e);
+		}
+	}
+
+	@Override
+	public void deleteUser(int typeCode, int followingUserCode, int id)
+			throws ServiceException {
+		try {
+			followedUserDao.deleteUser(typeCode, followingUserCode, id);
 		} catch (DaoException e) {
 			throw new ServiceException(e);
 		}

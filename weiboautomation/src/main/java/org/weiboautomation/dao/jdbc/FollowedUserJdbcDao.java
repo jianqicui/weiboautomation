@@ -54,13 +54,14 @@ public class FollowedUserJdbcDao implements FollowedUserDao {
 	}
 
 	@Override
-	public List<User> getUserListBeforeDays(int followingUserCode, int days)
-			throws DaoException {
-		String sql = "select id, sn from " + getTableName(followingUserCode)
-				+ " where datediff(now(), created_timestamp) >= ?  order by id";
+	public List<User> getUserListBeforeDays(int followingUserCode, int days,
+			int index, int size) throws DaoException {
+		String sql = "select id, sn from "
+				+ getTableName(followingUserCode)
+				+ " where datediff(now(), created_timestamp) >= ?  order by id limit ?, ?";
 
 		try {
-			return jdbcTemplate.query(sql, rowMapper, days);
+			return jdbcTemplate.query(sql, rowMapper, days, index, size);
 		} catch (Exception e) {
 			throw new DaoException(e);
 		}
@@ -69,6 +70,54 @@ public class FollowedUserJdbcDao implements FollowedUserDao {
 	@Override
 	public void deleteUser(int followingUserCode, int id) throws DaoException {
 		String sql = "delete from " + getTableName(followingUserCode)
+				+ " where id = ?";
+
+		try {
+			jdbcTemplate.update(sql, id);
+		} catch (Exception e) {
+			throw new DaoException(e);
+		}
+	}
+
+	private String getTableName(int typeCode, int followingUserCode) {
+		String tableName = "type" + typeCode + "_user" + followingUserCode
+				+ "_followed";
+
+		return tableName;
+	}
+
+	@Override
+	public void addUser(int typeCode, int followingUserCode, User user)
+			throws DaoException {
+		String sql = "insert into " + getTableName(typeCode, followingUserCode)
+				+ " (sn, created_timestamp) values (?, ?)";
+
+		try {
+			jdbcTemplate.update(sql, user.getSn(), new Date());
+		} catch (Exception e) {
+			throw new DaoException(e);
+		}
+	}
+
+	@Override
+	public List<User> getUserListBeforeDays(int typeCode,
+			int followingUserCode, int days, int index, int size)
+			throws DaoException {
+		String sql = "select id, sn from "
+				+ getTableName(typeCode, followingUserCode)
+				+ " where datediff(now(), created_timestamp) >= ?  order by id limit ?, ?";
+
+		try {
+			return jdbcTemplate.query(sql, rowMapper, days, index, size);
+		} catch (Exception e) {
+			throw new DaoException(e);
+		}
+	}
+
+	@Override
+	public void deleteUser(int typeCode, int followingUserCode, int id)
+			throws DaoException {
+		String sql = "delete from " + getTableName(typeCode, followingUserCode)
 				+ " where id = ?";
 
 		try {

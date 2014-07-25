@@ -9,9 +9,18 @@ public interface FollowedUserService {
 
 	void addUser(int followingUserCode, User user) throws ServiceException;
 
-	List<User> getUserListBeforeDays(int followingUserCode, int days)
-			throws ServiceException;
+	List<User> getUserListBeforeDays(int followingUserCode, int days,
+			int index, int size) throws ServiceException;
 
 	void deleteUser(int followingUserCode, int id) throws ServiceException;
+
+	void addUser(int typeCode, int followingUserCode, User user)
+			throws ServiceException;
+
+	List<User> getUserListBeforeDays(int typeCode, int followingUserCode,
+			int days, int index, int size) throws ServiceException;
+
+	void deleteUser(int typeCode, int followingUserCode, int id)
+			throws ServiceException;
 
 }

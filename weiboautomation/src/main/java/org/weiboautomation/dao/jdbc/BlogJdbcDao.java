@@ -18,12 +18,6 @@ public class BlogJdbcDao implements BlogDao {
 		this.jdbcTemplate = jdbcTemplate;
 	}
 
-	private String getTableName(int typeCode) {
-		String tableName = "type" + typeCode + "_blog";
-
-		return tableName;
-	}
-
 	private RowMapper<Blog> rowMapper = new BlogRowMapper();
 
 	private class BlogRowMapper implements RowMapper<Blog> {
@@ -39,6 +33,25 @@ public class BlogJdbcDao implements BlogDao {
 			return blog;
 		}
 
+	}
+
+	private String getTableName(int typeCode) {
+		String tableName = "type" + typeCode + "_blog";
+
+		return tableName;
+	}
+
+	@Override
+	public List<Blog> getDescendingBlogList(int typeCode, int index, int size)
+			throws DaoException {
+		String sql = "select id, text, picture from " + getTableName(typeCode)
+				+ " order by id desc limit ?, ?";
+
+		try {
+			return jdbcTemplate.query(sql, rowMapper, index, size);
+		} catch (Exception e) {
+			throw new DaoException(e);
+		}
 	}
 
 	@Override
@@ -60,8 +73,7 @@ public class BlogJdbcDao implements BlogDao {
 				+ " order by id limit ?, ?";
 
 		try {
-			return jdbcTemplate.query(sql, rowMapper, new Object[] { index,
-					size });
+			return jdbcTemplate.query(sql, rowMapper, index, size);
 		} catch (Exception e) {
 			throw new DaoException(e);
 		}
@@ -74,8 +86,7 @@ public class BlogJdbcDao implements BlogDao {
 				+ " order by rand() limit ?, ?";
 
 		try {
-			return jdbcTemplate.query(sql, rowMapper, new Object[] { index,
-					size });
+			return jdbcTemplate.query(sql, rowMapper, index, size);
 		} catch (Exception e) {
 			throw new DaoException(e);
 		}

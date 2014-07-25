@@ -21,4 +21,19 @@ public interface UserService {
 
 	void deleteUser(UserPhase userPhase, int id) throws ServiceException;
 
+	void addUser(int typeCode, UserPhase userPhase, User user)
+			throws ServiceException;
+
+	List<User> getUserList(int typeCode, UserPhase userPhase, int index,
+			int size) throws ServiceException;
+
+	boolean isSameUserExisting(int typeCode, UserPhase userPhase, User user)
+			throws ServiceException;
+
+	void moveUser(int typeCode, UserPhase fromUserPhase, UserPhase toUserPhase,
+			User user) throws ServiceException;
+
+	void deleteUser(int typeCode, UserPhase userPhase, int id)
+			throws ServiceException;
+
 }

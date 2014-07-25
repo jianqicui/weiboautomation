@@ -17,6 +17,16 @@ public class BlogServiceImpl implements BlogService {
 	}
 
 	@Override
+	public List<Blog> getDescendingBlogList(int typeCode, int index, int size)
+			throws ServiceException {
+		try {
+			return blogDao.getDescendingBlogList(typeCode, index, size);
+		} catch (DaoException e) {
+			throw new ServiceException(e);
+		}
+	}
+
+	@Override
 	public void addBlog(int typeCode, Blog blog) throws ServiceException {
 		try {
 			blogDao.addBlog(typeCode, blog);

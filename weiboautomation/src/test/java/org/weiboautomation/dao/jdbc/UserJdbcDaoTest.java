@@ -21,12 +21,25 @@ public class UserJdbcDaoTest {
 	private UserDao userDao;
 
 	@Test
-	public void testGetUserList() throws DaoException {
-		UserPhase userPhase = UserPhase.collected;
+	public void testGetUserListGlobally() throws DaoException {
+		UserPhase userPhase = UserPhase.filtered;
 		int index = 0;
 		int size = 10;
 
 		List<User> userList = userDao.getUserList(userPhase, index, size);
+
+		Assert.assertNotNull(userList);
+	}
+
+	@Test
+	public void testGetUserListIndividually() throws DaoException {
+		UserPhase userPhase = UserPhase.filtered;
+		int typeCode = 1;
+		int index = 0;
+		int size = 10;
+
+		List<User> userList = userDao.getUserList(typeCode, userPhase, index,
+				size);
 
 		Assert.assertNotNull(userList);
 	}

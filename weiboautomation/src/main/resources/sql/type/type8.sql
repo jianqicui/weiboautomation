@@ -7,16 +7,29 @@ create table type8_blog (
 	primary key (id)
 );
 
-create table type8_user_transfering (
+create table type8_operator_blog_transfering (
 	id int not null auto_increment,
   	cookies text not null,
   	blog_index int not null,
   	primary key (id)
 );
 
-create table type8_user_publishing (
+create table type8_operator_blog_publishing (
 	id int not null auto_increment,
   	cookies text not null,
   	primary key (id)
 );
 
+create table type8_user_filtered (
+	id int not null auto_increment,
+	sn varchar(20) not null,
+	primary key (id)
+);
+
+create table type8_operator_user_following (
+	id int not null auto_increment,
+	code int not null,
+  	cookies text not null,
+  	user_index int not null,
+  	primary key (id)
+);

@@ -35,7 +35,7 @@ insert into pp_tid_type (pp_tid, type_id) values
 (68, 19),
 (43, 20);
 
-create table user_querying (
+create table operator_user_querying (
 	id int not null auto_increment,
   	cookies text not null,
   	primary key (id)
@@ -66,9 +66,33 @@ create table user_filtered (
 	primary key (id)
 );
 
-create table user_following (
+create table operator_user_following (
 	id int not null auto_increment,
 	code int not null,
+  	cookies text not null,
+  	user_index int not null,
+  	primary key (id)
+);
+
+create table operator_user_filling (
+	id int not null auto_increment,
+  	cookies text not null,
+  	user_index int not null,
+  	primary key (id)
+);
+
+create table user_profile (
+	id int not null auto_increment,
+  	sn varchar(20) not null,
+  	name varchar(60) not null,
+  	gender varchar(10),
+  	location varchar(20),
+  	tags varchar(200),
+  	primary key (id)
+);
+
+create table operator_user_transfering (
+	id int not null auto_increment,
   	cookies text not null,
   	user_index int not null,
   	primary key (id)

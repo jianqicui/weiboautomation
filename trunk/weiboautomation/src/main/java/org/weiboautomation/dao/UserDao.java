@@ -18,4 +18,16 @@ public interface UserDao {
 
 	void deleteUser(UserPhase userPhase, int id) throws DaoException;
 
+	void addUser(int typeCode, UserPhase userPhase, User user)
+			throws DaoException;
+
+	List<User> getUserList(int typeCode, UserPhase userPhase, int index,
+			int size) throws DaoException;
+
+	boolean isSameUserExisting(int typeCode, UserPhase userPhase, User user)
+			throws DaoException;
+
+	void deleteUser(int typeCode, UserPhase userPhase, int id)
+			throws DaoException;
+
 }

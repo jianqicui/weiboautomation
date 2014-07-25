@@ -67,4 +67,56 @@ public class UserServiceImpl implements UserService {
 		}
 	}
 
+	@Override
+	public void addUser(int typeCode, UserPhase userPhase, User user)
+			throws ServiceException {
+		try {
+			userDao.addUser(typeCode, userPhase, user);
+		} catch (DaoException e) {
+			throw new ServiceException(e);
+		}
+	}
+
+	@Override
+	public List<User> getUserList(int typeCode, UserPhase userPhase, int index,
+			int size) throws ServiceException {
+		try {
+			return userDao.getUserList(typeCode, userPhase, index, size);
+		} catch (DaoException e) {
+			throw new ServiceException(e);
+		}
+	}
+
+	@Override
+	public boolean isSameUserExisting(int typeCode, UserPhase userPhase,
+			User user) throws ServiceException {
+		try {
+			return userDao.isSameUserExisting(typeCode, userPhase, user);
+		} catch (DaoException e) {
+			throw new ServiceException(e);
+		}
+	}
+
+	@Override
+	public void moveUser(int typeCode, UserPhase fromUserPhase,
+			UserPhase toUserPhase, User user) throws ServiceException {
+		try {
+			userDao.addUser(typeCode, toUserPhase, user);
+
+			userDao.deleteUser(fromUserPhase, user.getId());
+		} catch (DaoException e) {
+			throw new ServiceException(e);
+		}
+	}
+
+	@Override
+	public void deleteUser(int typeCode, UserPhase userPhase, int id)
+			throws ServiceException {
+		try {
+			userDao.deleteUser(typeCode, userPhase, id);
+		} catch (DaoException e) {
+			throw new ServiceException(e);
+		}
+	}
+
 }

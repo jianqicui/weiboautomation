@@ -19,12 +19,6 @@ public class UserJdbcDao implements UserDao {
 		this.jdbcTemplate = jdbcTemplate;
 	}
 
-	private String getTableName(UserPhase userPhase) {
-		String tableName = "user_" + userPhase;
-
-		return tableName;
-	}
-
 	private RowMapper<User> rowMapper = new UserRowMapper();
 
 	private class UserRowMapper implements RowMapper<User> {
@@ -39,6 +33,12 @@ public class UserJdbcDao implements UserDao {
 			return user;
 		}
 
+	}
+
+	private String getTableName(UserPhase userPhase) {
+		String tableName = "user_" + userPhase;
+
+		return tableName;
 	}
 
 	@Override
@@ -60,8 +60,7 @@ public class UserJdbcDao implements UserDao {
 				+ " order by id limit ?, ?";
 
 		try {
-			return jdbcTemplate.query(sql, rowMapper, new Object[] { index,
-					size });
+			return jdbcTemplate.query(sql, rowMapper, index, size);
 		} catch (Exception e) {
 			throw new DaoException(e);
 		}
@@ -88,6 +87,69 @@ public class UserJdbcDao implements UserDao {
 	@Override
 	public void deleteUser(UserPhase userPhase, int id) throws DaoException {
 		String sql = "delete from " + getTableName(userPhase) + " where id = ?";
+
+		try {
+			jdbcTemplate.update(sql, id);
+		} catch (Exception e) {
+			throw new DaoException(e);
+		}
+	}
+
+	private String getTableName(int typeCode, UserPhase userPhase) {
+		String tableName = "type" + typeCode + "_user_" + userPhase;
+
+		return tableName;
+	}
+
+	@Override
+	public void addUser(int typeCode, UserPhase userPhase, User user)
+			throws DaoException {
+		String sql = "insert into " + getTableName(typeCode, userPhase)
+				+ " (sn) values (?)";
+
+		try {
+			jdbcTemplate.update(sql, user.getSn());
+		} catch (Exception e) {
+			throw new DaoException(e);
+		}
+	}
+
+	@Override
+	public List<User> getUserList(int typeCode, UserPhase userPhase, int index,
+			int size) throws DaoException {
+		String sql = "select id, sn from " + getTableName(typeCode, userPhase)
+				+ " order by id limit ?, ?";
+
+		try {
+			return jdbcTemplate.query(sql, rowMapper, index, size);
+		} catch (Exception e) {
+			throw new DaoException(e);
+		}
+	}
+
+	@Override
+	public boolean isSameUserExisting(int typeCode, UserPhase userPhase,
+			User user) throws DaoException {
+		String sql = "select count(*) from "
+				+ getTableName(typeCode, userPhase) + " where sn = ?";
+
+		int size;
+
+		try {
+			size = jdbcTemplate.queryForObject(sql,
+					new Object[] { user.getSn() }, Integer.class);
+		} catch (Exception e) {
+			throw new DaoException(e);
+		}
+
+		return size > 0;
+	}
+
+	@Override
+	public void deleteUser(int typeCode, UserPhase userPhase, int id)
+			throws DaoException {
+		String sql = "delete from " + getTableName(typeCode, userPhase)
+				+ " where id = ?";
 
 		try {
 			jdbcTemplate.update(sql, id);

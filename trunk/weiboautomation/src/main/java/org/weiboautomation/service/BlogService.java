@@ -7,6 +7,9 @@ import org.weiboautomation.service.exception.ServiceException;
 
 public interface BlogService {
 
+	List<Blog> getDescendingBlogList(int typeCode, int index, int size)
+			throws ServiceException;
+
 	void addBlog(int typeCode, Blog blog) throws ServiceException;
 
 	List<Blog> getBlogList(int typeCode, int index, int size)

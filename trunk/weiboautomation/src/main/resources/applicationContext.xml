@@ -114,7 +114,8 @@
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
 	</bean>
 
-	<bean id="transferingUserDao" class="org.weiboautomation.dao.jdbc.TransferingUserJdbcDao">
+	<bean id="transferingBlogOperatorDao"
+		class="org.weiboautomation.dao.jdbc.TransferingBlogOperatorJdbcDao">
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
 	</bean>
 
@@ -122,11 +123,13 @@
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
 	</bean>
 
-	<bean id="publishingUserDao" class="org.weiboautomation.dao.jdbc.PublishingUserJdbcDao">
+	<bean id="publishingBlogOperatorDao"
+		class="org.weiboautomation.dao.jdbc.PublishingBlogOperatorJdbcDao">
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
 	</bean>
 
-	<bean id="queryingUserDao" class="org.weiboautomation.dao.jdbc.QueryingUserJdbcDao">
+	<bean id="queryingUserOperatorDao"
+		class="org.weiboautomation.dao.jdbc.QueryingUserOperatorJdbcDao">
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
 	</bean>
 
@@ -138,11 +141,25 @@
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
 	</bean>
 
-	<bean id="followingUserDao" class="org.weiboautomation.dao.jdbc.FollowingUserJdbcDao">
+	<bean id="followingUserOperatorDao"
+		class="org.weiboautomation.dao.jdbc.FollowingUserOperatorJdbcDao">
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
 	</bean>
 
 	<bean id="followedUserDao" class="org.weiboautomation.dao.jdbc.FollowedUserJdbcDao">
+		<property name="jdbcTemplate" ref="jdbcTemplate" />
+	</bean>
+
+	<bean id="fillingUserOperatorDao" class="org.weiboautomation.dao.jdbc.FillingUserOperatorJdbcDao">
+		<property name="jdbcTemplate" ref="jdbcTemplate" />
+	</bean>
+
+	<bean id="userProfileDao" class="org.weiboautomation.dao.jdbc.UserProfileJdbcDao">
+		<property name="jdbcTemplate" ref="jdbcTemplate" />
+	</bean>
+
+	<bean id="transferingUserOperatorDao"
+		class="org.weiboautomation.dao.jdbc.TransferingUserOperatorJdbcDao">
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
 	</bean>
 
@@ -155,23 +172,23 @@
 		<property name="blogDao" ref="blogDao" />
 	</bean>
 
-	<bean id="transferingUserService"
-		class="org.weiboautomation.service.impl.TransferingUserServiceImpl">
-		<property name="transferingUserDao" ref="transferingUserDao" />
+	<bean id="transferingBlogOperatorService"
+		class="org.weiboautomation.service.impl.TransferingBlogOperatorServiceImpl">
+		<property name="transferingBlogOperatorDao" ref="transferingBlogOperatorDao" />
 	</bean>
 
 	<bean id="typeService" class="org.weiboautomation.service.impl.TypeServiceImpl">
 		<property name="typeDao" ref="typeDao" />
 	</bean>
 
-	<bean id="publishingUserService"
-		class="org.weiboautomation.service.impl.PublishingUserServiceImpl">
-		<property name="publishingUserDao" ref="publishingUserDao" />
+	<bean id="publishingBlogOperatorService"
+		class="org.weiboautomation.service.impl.PublishingBlogOperatorServiceImpl">
+		<property name="publishingBlogOperatorDao" ref="publishingBlogOperatorDao" />
 	</bean>
 
-	<bean id="queryingUserService"
-		class="org.weiboautomation.service.impl.QueryingUserServiceImpl">
-		<property name="queryingUserDao" ref="queryingUserDao" />
+	<bean id="queryingUserOperatorService"
+		class="org.weiboautomation.service.impl.QueryingUserOperatorServiceImpl">
+		<property name="queryingUserOperatorDao" ref="queryingUserOperatorDao" />
 	</bean>
 
 	<bean id="collectingUserService"
@@ -183,14 +200,28 @@
 		<property name="userDao" ref="userDao" />
 	</bean>
 
-	<bean id="followingUserService"
-		class="org.weiboautomation.service.impl.FollowingUserServiceImpl">
-		<property name="followingUserDao" ref="followingUserDao" />
+	<bean id="followingUserOperatorService"
+		class="org.weiboautomation.service.impl.FollowingUserOperatorServiceImpl">
+		<property name="followingUserOperatorDao" ref="followingUserOperatorDao" />
 	</bean>
 
 	<bean id="followedUserService"
 		class="org.weiboautomation.service.impl.FollowedUserServiceImpl">
 		<property name="followedUserDao" ref="followedUserDao" />
+	</bean>
+
+	<bean id="fillingUserOperatorService"
+		class="org.weiboautomation.service.impl.FillingUserOperatorServiceImpl">
+		<property name="fillingUserOperatorDao" ref="fillingUserOperatorDao" />
+	</bean>
+
+	<bean id="userProfileService" class="org.weiboautomation.service.impl.UserProfileServiceImpl">
+		<property name="userProfileDao" ref="userProfileDao" />
+	</bean>
+
+	<bean id="transferingUserOperatorService"
+		class="org.weiboautomation.service.impl.TransferingUserOperatorServiceImpl">
+		<property name="transferingUserOperatorDao" ref="transferingUserOperatorDao" />
 	</bean>
 
 	<!-- Handler -->
@@ -221,7 +252,7 @@
 		</property>
 		<property name="ppTidTypeService" ref="ppTidTypeService" />
 		<property name="blogService" ref="blogService" />
-		<property name="transferingUserService" ref="transferingUserService" />
+		<property name="transferingBlogOperatorService" ref="transferingBlogOperatorService" />
 		<property name="transferingBlogSize">
 			<value>1</value>
 		</property>
@@ -238,22 +269,31 @@
 		<property name="publishingBlogSize">
 			<value>1</value>
 		</property>
-		<property name="publishingUserService" ref="publishingUserService" />
+		<property name="publishingBlogOperatorService" ref="publishingBlogOperatorService" />
 		<property name="saeAppBatchhelperHandler" ref="saeAppBatchhelperHandler" />
-		<property name="queryingUserService" ref="queryingUserService" />
+		<property name="queryingUserOperatorService" ref="queryingUserOperatorService" />
 		<property name="collectingUserService" ref="collectingUserService" />
 		<property name="weiboApiHandler" ref="weiboApiHandler" />
 		<property name="userService" ref="userService" />
 		<property name="filteringUserSize">
 			<value>2000</value>
 		</property>
-		<property name="followingUserService" ref="followingUserService" />
+		<property name="followingUserOperatorService" ref="followingUserOperatorService" />
 		<property name="followingUserSize">
 			<value>25</value>
 		</property>
 		<property name="followedUserService" ref="followedUserService" />
 		<property name="reservingFollowedDays">
 			<value>5</value>
+		</property>
+		<property name="fillingUserOperatorService" ref="fillingUserOperatorService" />
+		<property name="fillingUserSize">
+			<value>10</value>
+		</property>
+		<property name="userProfileService" ref="userProfileService" />
+		<property name="transferingUserOperatorService" ref="transferingUserOperatorService" />
+		<property name="transferingUserSize">
+			<value>10000</value>
 		</property>
 	</bean>
 
@@ -268,8 +308,14 @@
 			cron="0 0 0,2,4,6,8,10,12,14,16,18,20,22 * * ?" />
 		<task:scheduled ref="weiboAutomationAction" method="collectAndFilterUsers"
 			fixed-delay="60000" />
-		<task:scheduled ref="weiboAutomationAction" method="followAndUnfollowUsers"
+		<task:scheduled ref="weiboAutomationAction" method="followAndUnfollowUsersGlobally"
 			cron="0 0 0,2,4,6,8,10,12,14,16,18,20,22 * * ?" />
+		<task:scheduled ref="weiboAutomationAction"
+			method="followAndUnfollowUsersIndividually" cron="0 0 0,2,4,6,8,10,12,14,16,18,20,22 * * ?" />
+		<task:scheduled ref="weiboAutomationAction" method="fillUsers"
+			fixed-delay="60000" />
+		<task:scheduled ref="weiboAutomationAction" method="transferUsers"
+			fixed-delay="60000" />
 	</task:scheduled-tasks>
 
 </beans>

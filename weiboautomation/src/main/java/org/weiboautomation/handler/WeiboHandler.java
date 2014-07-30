@@ -169,7 +169,11 @@ public class WeiboHandler {
 		if (!result.startsWith("sinaSSOController.doCrossDomainCallBack")) {
 			query = loginWeiboQuery(result);
 
-			loginWeibo(httpClient, query);
+			result = loginWeibo(httpClient, query);
+
+			if (!result.startsWith("sinaSSOController.doCrossDomainCallBack")) {
+				throw new HandlerException("Refresh failed");
+			}
 		}
 	}
 

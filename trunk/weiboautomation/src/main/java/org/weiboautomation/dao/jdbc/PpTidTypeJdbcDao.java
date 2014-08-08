@@ -71,4 +71,5 @@ public class PpTidTypeJdbcDao implements PpTidTypeDao {
 			throw new DaoException(e);
 		}
 	}
+	
 }

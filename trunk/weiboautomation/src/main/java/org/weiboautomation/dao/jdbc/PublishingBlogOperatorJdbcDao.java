@@ -64,4 +64,5 @@ public class PublishingBlogOperatorJdbcDao implements PublishingBlogOperatorDao 
 			throw new DaoException(e);
 		}
 	}
+	
 }

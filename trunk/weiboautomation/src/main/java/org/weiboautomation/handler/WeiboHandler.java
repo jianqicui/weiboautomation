@@ -5,6 +5,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.io.Charsets;
 import org.apache.http.HttpHeaders;
@@ -16,6 +18,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.weiboautomation.handler.exception.HandlerException;
@@ -23,32 +26,16 @@ import org.weiboautomation.handler.exception.HandlerException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 
 public class WeiboHandler {
+
+	private static final Pattern locationReplacePattern = Pattern
+			.compile("location.replace\\('.*'\\)");
 
 	private ObjectMapper objectMapper;
 
 	public void initialize() {
 		objectMapper = new ObjectMapper();
-	}
-
-	private JsonNode getJsonNode(String result) throws HandlerException {
-		int beginIndex = result.indexOf("(");
-		int endIndex = result.lastIndexOf(")");
-
-		JsonNode jsonNode;
-
-		try {
-			jsonNode = objectMapper.readTree(result.substring(beginIndex + 1,
-					endIndex));
-		} catch (JsonProcessingException e) {
-			throw new HandlerException(e);
-		} catch (IOException e) {
-			throw new HandlerException(e);
-		}
-
-		return jsonNode;
 	}
 
 	private String get(HttpClient httpClient, String url)
@@ -79,102 +66,37 @@ public class WeiboHandler {
 		return result;
 	}
 
-	private String crossDomain(HttpClient httpClient) throws HandlerException {
-		StringBuilder url = new StringBuilder();
-
-		url.append("http://login.sina.com.cn/sso/crossdomain.php");
-		url.append("?");
-		url.append("scriptId");
-		url.append("=");
-		url.append("ssoCrossDomainScriptId");
-		url.append("&");
-		url.append("callback");
-		url.append("=");
-		url.append("sinaSSOController.crossDomainCallBack");
-		url.append("&");
-		url.append("action");
-		url.append("=");
-		url.append("login");
-		url.append("&");
-		url.append("domain");
-		url.append("=");
-		url.append("sina.com.cn");
-		url.append("&");
-		url.append("sr");
-		url.append("=");
-		url.append("1440*900");
-		url.append("&");
-		url.append("client");
-		url.append("=");
-		url.append("ssologin.js(v1.4.13)");
-
-		String result = get(httpClient, url.toString());
-
-		return result;
-	}
-
-	private String loginWeiboQuery(String result) throws HandlerException {
-		JsonNode jsonNode = getJsonNode(result);
-
-		String arrUrl = ((ArrayNode) jsonNode.get("arrURL")).get(0).asText();
-
-		String query;
+	public void login(HttpClient httpClient) throws HandlerException {
+		URI uri;
 
 		try {
-			URI uri = new URI(arrUrl);
-
-			query = uri.getQuery();
+			uri = new URIBuilder().setScheme("http")
+					.setHost("login.sina.com.cn").setPath("/sso/login.php")
+					.setParameter("url", "http://weibo.com/")
+					.addParameter("gateway", "1")
+					.setParameter("service", "miniblog")
+					.setParameter("entry", "miniblog")
+					.setParameter("useticket", "1")
+					.setParameter("returntype", "META").build();
 		} catch (URISyntaxException e) {
 			throw new HandlerException(e);
 		}
 
-		return query;
-	}
+		String result = get(httpClient, uri.toString());
 
-	private String loginWeibo(HttpClient httpClient, String query)
-			throws HandlerException {
-		StringBuilder url = new StringBuilder();
+		Matcher matcher = locationReplacePattern.matcher(result);
 
-		url.append("http://www.weibo.com/sso/login.php");
-		url.append("?");
-		url.append(query);
-		url.append("&");
-		url.append("callback");
-		url.append("=");
-		url.append("sinaSSOController.doCrossDomainCallBack");
-		url.append("&");
-		url.append("scriptId");
-		url.append("=");
-		url.append("ssoscript0");
-		url.append("&");
-		url.append("client");
-		url.append("=");
-		url.append("ssologin.js(v1.4.13)");
+		String url;
 
-		String result = get(httpClient, url.toString());
+		if (matcher.find()) {
+			result = matcher.group();
 
-		return result;
-	}
-
-	public void refresh(HttpClient httpClient) throws HandlerException {
-		// crossDomain
-		String result = crossDomain(httpClient);
-
-		// loginWeiboQuery
-		String query = loginWeiboQuery(result);
-
-		// loginWeibo
-		result = loginWeibo(httpClient, query);
-
-		if (!result.startsWith("sinaSSOController.doCrossDomainCallBack")) {
-			query = loginWeiboQuery(result);
-
-			result = loginWeibo(httpClient, query);
-
-			if (!result.startsWith("sinaSSOController.doCrossDomainCallBack")) {
-				throw new HandlerException("Refresh failed");
-			}
+			url = result.substring(18, result.length() - 2);
+		} else {
+			throw new HandlerException("Login failed");
 		}
+
+		get(httpClient, url);
 	}
 
 	private byte[] post(HttpClient httpClient, HttpPost post)

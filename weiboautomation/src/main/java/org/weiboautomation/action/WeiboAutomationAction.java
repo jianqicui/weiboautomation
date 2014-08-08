@@ -6,6 +6,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -25,7 +26,6 @@ import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.CookieStore;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.params.ClientPNames;
@@ -33,7 +33,6 @@ import org.apache.http.client.params.CookiePolicy;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
-import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.PoolingClientConnectionManager;
@@ -53,6 +52,7 @@ import org.weiboautomation.entity.PpTidType;
 import org.weiboautomation.entity.PublishingBlogOperator;
 import org.weiboautomation.entity.QueryingUserOperator;
 import org.weiboautomation.entity.SaeStorage;
+import org.weiboautomation.entity.TiminglyPublishingBlogOperator;
 import org.weiboautomation.entity.TransferingBlogOperator;
 import org.weiboautomation.entity.TransferingUserOperator;
 import org.weiboautomation.entity.Type;
@@ -74,6 +74,7 @@ import org.weiboautomation.service.FollowingUserOperatorService;
 import org.weiboautomation.service.PpTidTypeService;
 import org.weiboautomation.service.PublishingBlogOperatorService;
 import org.weiboautomation.service.QueryingUserOperatorService;
+import org.weiboautomation.service.TiminglyPublishingBlogOperatorService;
 import org.weiboautomation.service.TransferingBlogOperatorService;
 import org.weiboautomation.service.TransferingUserOperatorService;
 import org.weiboautomation.service.TypeService;
@@ -124,6 +125,10 @@ public class WeiboAutomationAction {
 
 	private SaeAppBatchhelperHandler saeAppBatchhelperHandler;
 
+	private TiminglyPublishingBlogOperatorService timinglyPublishingBlogOperatorService;
+
+	private int timinglyPublishingBlogSize;
+
 	private QueryingUserOperatorService queryingUserOperatorService;
 
 	private CollectingUserService collectingUserService;
@@ -161,6 +166,8 @@ public class WeiboAutomationAction {
 	private DefaultHttpClient transferingBlogsDefaultHttpClient;
 
 	private DefaultHttpClient publishingBlogsDefaultHttpClient;
+
+	private DefaultHttpClient timinglyPublishingBlogsDefaultHttpClient;
 
 	private DefaultHttpClient collectingUsersDefaultHttpClient;
 
@@ -243,6 +250,15 @@ public class WeiboAutomationAction {
 		this.saeAppBatchhelperHandler = saeAppBatchhelperHandler;
 	}
 
+	public void setTiminglyPublishingBlogOperatorService(
+			TiminglyPublishingBlogOperatorService timinglyPublishingBlogOperatorService) {
+		this.timinglyPublishingBlogOperatorService = timinglyPublishingBlogOperatorService;
+	}
+
+	public void setTiminglyPublishingBlogSize(int timinglyPublishingBlogSize) {
+		this.timinglyPublishingBlogSize = timinglyPublishingBlogSize;
+	}
+
 	public void setQueryingUserOperatorService(
 			QueryingUserOperatorService queryingUserOperatorService) {
 		this.queryingUserOperatorService = queryingUserOperatorService;
@@ -312,6 +328,7 @@ public class WeiboAutomationAction {
 		collectingBlogsDefaultHttpClient = getDefaultHttpClient();
 		transferingBlogsDefaultHttpClient = getDefaultHttpClient();
 		publishingBlogsDefaultHttpClient = getDefaultHttpClient();
+		timinglyPublishingBlogsDefaultHttpClient = getDefaultHttpClient();
 		collectingUsersDefaultHttpClient = getDefaultHttpClient();
 		followingUsersGloballyDefaultHttpClient = getDefaultHttpClient();
 		unfollowingUsersGloballyDefaultHttpClient = getDefaultHttpClient();
@@ -325,6 +342,8 @@ public class WeiboAutomationAction {
 		collectingBlogsDefaultHttpClient.getConnectionManager().shutdown();
 		transferingBlogsDefaultHttpClient.getConnectionManager().shutdown();
 		publishingBlogsDefaultHttpClient.getConnectionManager().shutdown();
+		timinglyPublishingBlogsDefaultHttpClient.getConnectionManager()
+				.shutdown();
 		collectingUsersDefaultHttpClient.getConnectionManager().shutdown();
 		followingUsersGloballyDefaultHttpClient.getConnectionManager()
 				.shutdown();
@@ -609,24 +628,6 @@ public class WeiboAutomationAction {
 		defaultHttpClient.setCookieStore(basicCookieStore);
 	}
 
-	private byte[] getCookies(DefaultHttpClient defaultHttpClient) {
-		byte[] cookies;
-
-		CookieStore cookieStore = defaultHttpClient.getCookieStore();
-
-		List<Cookie> cookieList = cookieStore.getCookies();
-
-		try {
-			cookies = objectMapper.writeValueAsBytes(cookieList);
-		} catch (JsonProcessingException e) {
-			logger.error("Exception", e);
-
-			throw new ActionException(e);
-		}
-
-		return cookies;
-	}
-
 	public void transferBlogs() {
 		SaeStorage saeStorage;
 
@@ -685,7 +686,7 @@ public class WeiboAutomationAction {
 					transferingBlogOperator.getCookies());
 
 			try {
-				weiboHandler.refresh(transferingBlogsDefaultHttpClient);
+				weiboHandler.login(transferingBlogsDefaultHttpClient);
 			} catch (HandlerException e) {
 				continue;
 			}
@@ -820,9 +821,6 @@ public class WeiboAutomationAction {
 				transferingBlogIndex++;
 			}
 
-			transferingBlogOperator
-					.setCookies(getCookies(transferingBlogsDefaultHttpClient));
-
 			transferingBlogOperator.setBlogIndex(transferingBlogIndex);
 
 			try {
@@ -877,7 +875,7 @@ public class WeiboAutomationAction {
 						publishingBlogOperator.getCookies());
 
 				try {
-					weiboHandler.refresh(publishingBlogsDefaultHttpClient);
+					weiboHandler.login(publishingBlogsDefaultHttpClient);
 				} catch (HandlerException e) {
 					continue;
 				}
@@ -914,12 +912,121 @@ public class WeiboAutomationAction {
 					sleep();
 				}
 
-				publishingBlogOperator
-						.setCookies(getCookies(publishingBlogsDefaultHttpClient));
-
 				try {
 					publishingBlogOperatorService.updatePublishingBlogOperator(
 							typeCode, publishingBlogOperator);
+				} catch (ServiceException e) {
+					logger.error("Exception", e);
+
+					throw new ActionException(e);
+				}
+			}
+		}
+	}
+
+	public void timinglyPublishBlogs() {
+		List<Type> typeList;
+
+		try {
+			typeList = typeService.getTypeList();
+		} catch (ServiceException e) {
+			logger.error("Exception", e);
+
+			throw new ActionException(e);
+		}
+
+		for (Type type : typeList) {
+			int typeCode = type.getCode();
+
+			List<TiminglyPublishingBlogOperator> timinglyPublishingBlogOperatorList;
+
+			try {
+				timinglyPublishingBlogOperatorList = timinglyPublishingBlogOperatorService
+						.getTiminglyPublishingBlogOperatorList(typeCode);
+			} catch (ServiceException e) {
+				logger.error("Exception", e);
+
+				throw new ActionException(e);
+			}
+
+			for (TiminglyPublishingBlogOperator timinglyPublishingBlogOperator : timinglyPublishingBlogOperatorList) {
+				String userSn = timinglyPublishingBlogOperator.getSn();
+
+				setCookies(timinglyPublishingBlogsDefaultHttpClient,
+						timinglyPublishingBlogOperator.getCookies());
+
+				try {
+					weiboHandler
+							.login(timinglyPublishingBlogsDefaultHttpClient);
+				} catch (HandlerException e) {
+					continue;
+				}
+
+				sleep();
+
+				Date beginDate = timinglyPublishingBlogOperator.getBeginDate();
+				Date endDate = timinglyPublishingBlogOperator.getEndDate();
+				List<Integer> hourList = timinglyPublishingBlogOperator
+						.getHourList();
+
+				Date now = new Date();
+
+				if (beginDate.before(now) && now.before(endDate)) {
+					Calendar cal = Calendar.getInstance();
+					cal.setTime(now);
+
+					int hour = cal.get(Calendar.HOUR_OF_DAY);
+
+					if (hourList.contains(hour)) {
+						try {
+							saeAppBatchhelperHandler
+									.authorize(timinglyPublishingBlogsDefaultHttpClient);
+						} catch (HandlerException e) {
+							continue;
+						}
+
+						sleep();
+
+						List<Blog> blogList;
+
+						try {
+							blogList = blogService.getRandomBlogList(typeCode,
+									0, timinglyPublishingBlogSize);
+						} catch (ServiceException e) {
+							logger.error("Exception", e);
+
+							throw new ActionException(e);
+						}
+
+						for (Blog blog : blogList) {
+							int blogId = blog.getId();
+
+							logger.debug(
+									"Begin to timingly publish blog, typeCode = {}, userSn = {}, blogId = {}",
+									typeCode, userSn, blogId);
+
+							try {
+								saeAppBatchhelperHandler
+										.publishBlog(
+												timinglyPublishingBlogsDefaultHttpClient,
+												blog);
+							} catch (HandlerException e) {
+								continue;
+							}
+
+							logger.debug(
+									"End to timingly publish blog, typeCode = {}, userSn = {}, blogId = {}",
+									typeCode, userSn, blogId);
+
+							sleep();
+						}
+					}
+				}
+
+				try {
+					timinglyPublishingBlogOperatorService
+							.updateTiminglyPublishingBlogOperator(typeCode,
+									timinglyPublishingBlogOperator);
 				} catch (ServiceException e) {
 					logger.error("Exception", e);
 
@@ -974,7 +1081,7 @@ public class WeiboAutomationAction {
 				queryingUserOperator.getCookies());
 
 		try {
-			weiboHandler.refresh(collectingUsersDefaultHttpClient);
+			weiboHandler.login(collectingUsersDefaultHttpClient);
 		} catch (HandlerException e) {
 			return;
 		}
@@ -1034,9 +1141,6 @@ public class WeiboAutomationAction {
 				throw new ActionException(e);
 			}
 		}
-
-		queryingUserOperator
-				.setCookies(getCookies(collectingUsersDefaultHttpClient));
 
 		try {
 			queryingUserOperatorService
@@ -1140,7 +1244,7 @@ public class WeiboAutomationAction {
 					followingUserOperator.getCookies());
 
 			try {
-				weiboHandler.refresh(followingUsersGloballyDefaultHttpClient);
+				weiboHandler.login(followingUsersGloballyDefaultHttpClient);
 			} catch (HandlerException e) {
 				continue;
 			}
@@ -1225,9 +1329,6 @@ public class WeiboAutomationAction {
 					"End to follow users globally, followingUserCode = {}, userSize = {}",
 					followingUserCode, userSize);
 
-			followingUserOperator
-					.setCookies(getCookies(followingUsersGloballyDefaultHttpClient));
-
 			followingUserOperator.setUserIndex(followingUserIndex);
 
 			try {
@@ -1272,7 +1373,7 @@ public class WeiboAutomationAction {
 					followingUserOperator.getCookies());
 
 			try {
-				weiboHandler.refresh(unfollowingUsersGloballyDefaultHttpClient);
+				weiboHandler.login(unfollowingUsersGloballyDefaultHttpClient);
 			} catch (HandlerException e) {
 				continue;
 			}
@@ -1314,9 +1415,6 @@ public class WeiboAutomationAction {
 			logger.debug(
 					"End to unfollow users globally, followingUserCode = {}, userSize = {}",
 					followingUserCode, userSize);
-
-			followingUserOperator
-					.setCookies(getCookies(unfollowingUsersGloballyDefaultHttpClient));
 
 			try {
 				followingUserOperatorService
@@ -1374,7 +1472,7 @@ public class WeiboAutomationAction {
 
 				try {
 					weiboHandler
-							.refresh(followingUsersIndividuallyDefaultHttpClient);
+							.login(followingUsersIndividuallyDefaultHttpClient);
 				} catch (HandlerException e) {
 					continue;
 				}
@@ -1461,9 +1559,6 @@ public class WeiboAutomationAction {
 						"End to follow users individually, typeCode = {}, followingUserCode = {}, userSize = {}",
 						typeCode, followingUserCode, userSize);
 
-				followingUserOperator
-						.setCookies(getCookies(followingUsersIndividuallyDefaultHttpClient));
-
 				followingUserOperator.setUserIndex(followingUserIndex);
 
 				try {
@@ -1523,7 +1618,7 @@ public class WeiboAutomationAction {
 
 				try {
 					weiboHandler
-							.refresh(unfollowingUsersIndividuallyDefaultHttpClient);
+							.login(unfollowingUsersIndividuallyDefaultHttpClient);
 				} catch (HandlerException e) {
 					continue;
 				}
@@ -1567,9 +1662,6 @@ public class WeiboAutomationAction {
 						"End to unfollow users individually, typeCode = {}, followingUserCode = {}, userSize = {}",
 						typeCode, followingUserCode, userSize);
 
-				followingUserOperator
-						.setCookies(getCookies(unfollowingUsersIndividuallyDefaultHttpClient));
-
 				try {
 					followingUserOperatorService.updateFollowingUserOperator(
 							typeCode, followingUserOperator);
@@ -1608,7 +1700,7 @@ public class WeiboAutomationAction {
 				fillingUserOperator.getCookies());
 
 		try {
-			weiboHandler.refresh(fillingUsersDefaultHttpClient);
+			weiboHandler.login(fillingUsersDefaultHttpClient);
 		} catch (HandlerException e) {
 			return;
 		}
@@ -1712,9 +1804,6 @@ public class WeiboAutomationAction {
 
 		logger.debug("End to fill users, userSize = {}", userSize);
 
-		fillingUserOperator
-				.setCookies(getCookies(fillingUsersDefaultHttpClient));
-
 		fillingUserOperator.setUserIndex(fillingUserIndex);
 
 		try {
@@ -1772,7 +1861,7 @@ public class WeiboAutomationAction {
 				transferingUserOperator.getCookies());
 
 		try {
-			weiboHandler.refresh(transferingUsersDefaultHttpClient);
+			weiboHandler.login(transferingUsersDefaultHttpClient);
 		} catch (HandlerException e) {
 			return;
 		}
@@ -1859,9 +1948,6 @@ public class WeiboAutomationAction {
 		}
 
 		transferingUserIndex = transferingUserIndex + userProfileList.size();
-
-		transferingUserOperator
-				.setCookies(getCookies(transferingUsersDefaultHttpClient));
 
 		transferingUserOperator.setUserIndex(transferingUserIndex);
 

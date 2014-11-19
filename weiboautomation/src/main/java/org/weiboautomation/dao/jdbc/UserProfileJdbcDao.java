@@ -80,4 +80,16 @@ public class UserProfileJdbcDao implements UserProfileDao {
 		}
 	}
 
+	@Override
+	public List<UserProfile> getRandomUserProfileList(int index, int size)
+			throws DaoException {
+		String sql = "select id, sn, name, gender, location, tags from user_profile order by rand() limit ?, ?";
+
+		try {
+			return jdbcTemplate.query(sql, rowMapper, index, size);
+		} catch (Exception e) {
+			throw new DaoException(e);
+		}
+	}
+
 }

@@ -2,20 +2,11 @@ package org.weiboautomation.entity;
 
 import java.util.List;
 
-public class UserProfile extends User {
+public class UserProfile extends UserBase {
 
-	private String name;
 	private String gender;
 	private String location;
 	private List<String> tagList;
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
 
 	public String getGender() {
 		return gender;

@@ -58,7 +58,7 @@ public class FollowedUserJdbcDao implements FollowedUserDao {
 			int index, int size) throws DaoException {
 		String sql = "select id, sn from "
 				+ getTableName(followingUserCode)
-				+ " where datediff(now(), created_timestamp) >= ?  order by id limit ?, ?";
+				+ " where datediff(now(), created_timestamp) >= ? order by id limit ?, ?";
 
 		try {
 			return jdbcTemplate.query(sql, rowMapper, days, index, size);
@@ -105,7 +105,7 @@ public class FollowedUserJdbcDao implements FollowedUserDao {
 			throws DaoException {
 		String sql = "select id, sn from "
 				+ getTableName(typeCode, followingUserCode)
-				+ " where datediff(now(), created_timestamp) >= ?  order by id limit ?, ?";
+				+ " where datediff(now(), created_timestamp) >= ? order by id limit ?, ?";
 
 		try {
 			return jdbcTemplate.query(sql, rowMapper, days, index, size);

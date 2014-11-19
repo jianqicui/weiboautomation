@@ -97,3 +97,55 @@ create table operator_user_transfering (
   	user_index int not null,
   	primary key (id)
 );
+
+create table operator_message_adding_globally (
+	id int not null auto_increment,
+	sn varchar(20) not null,
+  	cookies text not null,
+  	text varchar(200) not null,
+  	user_size int not null,
+  	begin_date date not null,
+  	end_date date not null,
+  	hours varchar(100) not null,
+  	primary key (id)
+);
+
+create table operator_message_adding_individually (
+	id int not null auto_increment,
+	sn varchar(20) not null,
+  	cookies text not null,
+  	text varchar(200) not null,
+  	user_size int not null,
+  	begin_date date not null,
+  	end_date date not null,
+  	hours varchar(100) not null,
+  	user_base_table_name varchar(40) not null,
+  	user_base_index int not null,
+  	primary key (id)
+);
+
+create table operator_comment_adding_globally (
+	id int not null auto_increment,
+	sn varchar(20) not null,
+  	cookies text not null,
+  	text varchar(200) not null,
+  	user_size int not null,
+  	begin_date date not null,
+  	end_date date not null,
+  	hours varchar(100) not null,
+  	primary key (id)
+);
+
+create table operator_comment_adding_individually (
+	id int not null auto_increment,
+	sn varchar(20) not null,
+  	cookies text not null,
+  	text varchar(200) not null,
+  	user_size int not null,
+  	begin_date date not null,
+  	end_date date not null,
+  	hours varchar(100) not null,
+  	user_base_table_name varchar(40) not null,
+  	user_base_index int not null,
+  	primary key (id)
+);

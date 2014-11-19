@@ -48,15 +48,20 @@ import org.weiboautomation.entity.Blog;
 import org.weiboautomation.entity.CollectingUser;
 import org.weiboautomation.entity.FillingUserOperator;
 import org.weiboautomation.entity.FollowingUserOperator;
+import org.weiboautomation.entity.GloballyAddingCommentOperator;
+import org.weiboautomation.entity.IndividuallyAddingCommentOperator;
+import org.weiboautomation.entity.IndividuallyAddingMessageOperator;
 import org.weiboautomation.entity.PpTidType;
 import org.weiboautomation.entity.PublishingBlogOperator;
 import org.weiboautomation.entity.QueryingUserOperator;
 import org.weiboautomation.entity.SaeStorage;
+import org.weiboautomation.entity.GloballyAddingMessageOperator;
 import org.weiboautomation.entity.TiminglyPublishingBlogOperator;
 import org.weiboautomation.entity.TransferingBlogOperator;
 import org.weiboautomation.entity.TransferingUserOperator;
 import org.weiboautomation.entity.Type;
 import org.weiboautomation.entity.User;
+import org.weiboautomation.entity.UserBase;
 import org.weiboautomation.entity.UserPhase;
 import org.weiboautomation.entity.UserProfile;
 import org.weiboautomation.handler.PpHandler;
@@ -71,13 +76,18 @@ import org.weiboautomation.service.CollectingUserService;
 import org.weiboautomation.service.FillingUserOperatorService;
 import org.weiboautomation.service.FollowedUserService;
 import org.weiboautomation.service.FollowingUserOperatorService;
+import org.weiboautomation.service.GloballyAddingCommentOperatorService;
+import org.weiboautomation.service.IndividuallyAddingCommentOperatorService;
+import org.weiboautomation.service.IndividuallyAddingMessageOperatorService;
 import org.weiboautomation.service.PpTidTypeService;
 import org.weiboautomation.service.PublishingBlogOperatorService;
 import org.weiboautomation.service.QueryingUserOperatorService;
+import org.weiboautomation.service.GloballyAddingMessageOperatorService;
 import org.weiboautomation.service.TiminglyPublishingBlogOperatorService;
 import org.weiboautomation.service.TransferingBlogOperatorService;
 import org.weiboautomation.service.TransferingUserOperatorService;
 import org.weiboautomation.service.TypeService;
+import org.weiboautomation.service.UserBaseService;
 import org.weiboautomation.service.UserProfileService;
 import org.weiboautomation.service.UserService;
 import org.weiboautomation.service.exception.ServiceException;
@@ -127,8 +137,6 @@ public class WeiboAutomationAction {
 
 	private TiminglyPublishingBlogOperatorService timinglyPublishingBlogOperatorService;
 
-	private int timinglyPublishingBlogSize;
-
 	private QueryingUserOperatorService queryingUserOperatorService;
 
 	private CollectingUserService collectingUserService;
@@ -161,6 +169,16 @@ public class WeiboAutomationAction {
 
 	private UrlValidator urlValidator;
 
+	private UserBaseService userBaseService;
+
+	private GloballyAddingMessageOperatorService globallyAddingMessageOperatorService;
+
+	private IndividuallyAddingMessageOperatorService individuallyAddingMessageOperatorService;
+
+	private GloballyAddingCommentOperatorService globallyAddingCommentOperatorService;
+
+	private IndividuallyAddingCommentOperatorService individuallyAddingCommentOperatorService;
+
 	private DefaultHttpClient collectingBlogsDefaultHttpClient;
 
 	private DefaultHttpClient transferingBlogsDefaultHttpClient;
@@ -182,6 +200,14 @@ public class WeiboAutomationAction {
 	private DefaultHttpClient fillingUsersDefaultHttpClient;
 
 	private DefaultHttpClient transferingUsersDefaultHttpClient;
+
+	private DefaultHttpClient globallyAddingMessagesDefaultHttpClient;
+
+	private DefaultHttpClient individuallyAddingMessagesDefaultHttpClient;
+
+	private DefaultHttpClient globallyAddingCommentsDefaultHttpClient;
+
+	private DefaultHttpClient individuallyAddingCommentsDefaultHttpClient;
 
 	public void setPpHandler(PpHandler ppHandler) {
 		this.ppHandler = ppHandler;
@@ -255,10 +281,6 @@ public class WeiboAutomationAction {
 		this.timinglyPublishingBlogOperatorService = timinglyPublishingBlogOperatorService;
 	}
 
-	public void setTiminglyPublishingBlogSize(int timinglyPublishingBlogSize) {
-		this.timinglyPublishingBlogSize = timinglyPublishingBlogSize;
-	}
-
 	public void setQueryingUserOperatorService(
 			QueryingUserOperatorService queryingUserOperatorService) {
 		this.queryingUserOperatorService = queryingUserOperatorService;
@@ -320,6 +342,30 @@ public class WeiboAutomationAction {
 		this.transferingUserSize = transferingUserSize;
 	}
 
+	public void setUserBaseService(UserBaseService userBaseService) {
+		this.userBaseService = userBaseService;
+	}
+
+	public void setGloballyAddingMessageOperatorService(
+			GloballyAddingMessageOperatorService globallyAddingMessageOperatorService) {
+		this.globallyAddingMessageOperatorService = globallyAddingMessageOperatorService;
+	}
+
+	public void setIndividuallyAddingMessageOperatorService(
+			IndividuallyAddingMessageOperatorService individuallyAddingMessageOperatorService) {
+		this.individuallyAddingMessageOperatorService = individuallyAddingMessageOperatorService;
+	}
+
+	public void setGloballyAddingCommentOperatorService(
+			GloballyAddingCommentOperatorService globallyAddingCommentOperatorService) {
+		this.globallyAddingCommentOperatorService = globallyAddingCommentOperatorService;
+	}
+
+	public void setIndividuallyAddingCommentOperatorService(
+			IndividuallyAddingCommentOperatorService individuallyAddingCommentOperatorService) {
+		this.individuallyAddingCommentOperatorService = individuallyAddingCommentOperatorService;
+	}
+
 	public void initialize() {
 		objectMapper = new ObjectMapper();
 
@@ -336,6 +382,10 @@ public class WeiboAutomationAction {
 		unfollowingUsersIndividuallyDefaultHttpClient = getDefaultHttpClient();
 		fillingUsersDefaultHttpClient = getDefaultHttpClient();
 		transferingUsersDefaultHttpClient = getDefaultHttpClient();
+		globallyAddingMessagesDefaultHttpClient = getDefaultHttpClient();
+		individuallyAddingMessagesDefaultHttpClient = getDefaultHttpClient();
+		globallyAddingCommentsDefaultHttpClient = getDefaultHttpClient();
+		individuallyAddingCommentsDefaultHttpClient = getDefaultHttpClient();
 	}
 
 	public void destroy() {
@@ -355,6 +405,14 @@ public class WeiboAutomationAction {
 				.shutdown();
 		fillingUsersDefaultHttpClient.getConnectionManager().shutdown();
 		transferingUsersDefaultHttpClient.getConnectionManager().shutdown();
+		globallyAddingMessagesDefaultHttpClient.getConnectionManager()
+				.shutdown();
+		individuallyAddingMessagesDefaultHttpClient.getConnectionManager()
+				.shutdown();
+		globallyAddingCommentsDefaultHttpClient.getConnectionManager()
+				.shutdown();
+		individuallyAddingCommentsDefaultHttpClient.getConnectionManager()
+				.shutdown();
 	}
 
 	private DefaultHttpClient getDefaultHttpClient() {
@@ -390,7 +448,8 @@ public class WeiboAutomationAction {
 			throw new ActionException(e);
 		}
 
-		SSLSocketFactory ssf = new SSLSocketFactory(sslContext);
+		SSLSocketFactory ssf = new SSLSocketFactory(sslContext,
+				SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
 		Scheme scheme = new Scheme("https", 443, ssf);
 
 		SchemeRegistry registry = SchemeRegistryFactory.createDefault();
@@ -989,9 +1048,11 @@ public class WeiboAutomationAction {
 
 						List<Blog> blogList;
 
+						int blogSize = 1;
+
 						try {
 							blogList = blogService.getRandomBlogList(typeCode,
-									0, timinglyPublishingBlogSize);
+									0, blogSize);
 						} catch (ServiceException e) {
 							logger.error("Exception", e);
 
@@ -1308,13 +1369,13 @@ public class WeiboAutomationAction {
 				try {
 					weiboHandler.follow(
 							followingUsersGloballyDefaultHttpClient, userSn);
-
-					userSize++;
 				} catch (HandlerException e) {
-
+					continue;
 				}
 
 				sleep();
+
+				userSize++;
 
 				try {
 					followedUserService.addUser(followingUserCode, user);
@@ -1394,13 +1455,13 @@ public class WeiboAutomationAction {
 				try {
 					weiboHandler.unfollow(
 							unfollowingUsersGloballyDefaultHttpClient, userSn);
-
-					userSize++;
 				} catch (HandlerException e) {
-
+					continue;
 				}
 
 				sleep();
+
+				userSize++;
 
 				try {
 					followedUserService.deleteUser(followingUserCode,
@@ -1415,6 +1476,27 @@ public class WeiboAutomationAction {
 			logger.debug(
 					"End to unfollow users globally, followingUserCode = {}, userSize = {}",
 					followingUserCode, userSize);
+
+			try {
+				userList = followedUserService.getUserListBeforeDays(
+						followingUserCode, reservingFollowedDays + 1, 0,
+						followingUserSize * 2);
+			} catch (ServiceException e) {
+				logger.error("Exception", e);
+
+				throw new ActionException(e);
+			}
+
+			for (User user : userList) {
+				try {
+					followedUserService.deleteUser(followingUserCode,
+							user.getId());
+				} catch (ServiceException e) {
+					logger.error("Exception", e);
+
+					throw new ActionException(e);
+				}
+			}
 
 			try {
 				followingUserOperatorService
@@ -1537,13 +1619,13 @@ public class WeiboAutomationAction {
 						weiboHandler.follow(
 								followingUsersIndividuallyDefaultHttpClient,
 								userSn);
-
-						userSize++;
 					} catch (HandlerException e) {
 
 					}
 
 					sleep();
+
+					userSize++;
 
 					try {
 						followedUserService.addUser(typeCode,
@@ -1640,13 +1722,13 @@ public class WeiboAutomationAction {
 						weiboHandler.unfollow(
 								unfollowingUsersIndividuallyDefaultHttpClient,
 								userSn);
-
-						userSize++;
 					} catch (HandlerException e) {
-
+						continue;
 					}
 
 					sleep();
+
+					userSize++;
 
 					try {
 						followedUserService.deleteUser(typeCode,
@@ -1661,6 +1743,28 @@ public class WeiboAutomationAction {
 				logger.debug(
 						"End to unfollow users individually, typeCode = {}, followingUserCode = {}, userSize = {}",
 						typeCode, followingUserCode, userSize);
+
+				try {
+					userList = followedUserService
+							.getUserListBeforeDays(typeCode, followingUserCode,
+									reservingFollowedDays + 1, 0,
+									followingUserSize * 2);
+				} catch (ServiceException e) {
+					logger.error("Exception", e);
+
+					throw new ActionException(e);
+				}
+
+				for (User user : userList) {
+					try {
+						followedUserService.deleteUser(typeCode,
+								followingUserCode, user.getId());
+					} catch (ServiceException e) {
+						logger.error("Exception", e);
+
+						throw new ActionException(e);
+					}
+				}
 
 				try {
 					followingUserOperatorService.updateFollowingUserOperator(
@@ -1958,6 +2062,449 @@ public class WeiboAutomationAction {
 			logger.error("Exception", e);
 
 			throw new ActionException(e);
+		}
+	}
+
+	public void globallyAddMessages() {
+		List<GloballyAddingMessageOperator> globallyAddingMessageOperatorList;
+
+		try {
+			globallyAddingMessageOperatorList = globallyAddingMessageOperatorService
+					.getGloballyAddingMessageOperatorList();
+		} catch (ServiceException e) {
+			logger.error("Exception", e);
+
+			throw new ActionException(e);
+		}
+
+		for (GloballyAddingMessageOperator globallyAddingMessageOperator : globallyAddingMessageOperatorList) {
+			String userSn = globallyAddingMessageOperator.getSn();
+
+			setCookies(globallyAddingMessagesDefaultHttpClient,
+					globallyAddingMessageOperator.getCookies());
+
+			try {
+				weiboHandler.login(globallyAddingMessagesDefaultHttpClient);
+			} catch (HandlerException e) {
+				continue;
+			}
+
+			sleep();
+
+			String text = globallyAddingMessageOperator.getText();
+
+			int userSize = globallyAddingMessageOperator.getUserSize();
+
+			Date beginDate = globallyAddingMessageOperator.getBeginDate();
+			Date endDate = globallyAddingMessageOperator.getEndDate();
+			List<Integer> hourList = globallyAddingMessageOperator
+					.getHourList();
+
+			Date now = new Date();
+
+			if (beginDate.before(now) && now.before(endDate)) {
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(now);
+
+				int hour = cal.get(Calendar.HOUR_OF_DAY);
+
+				if (hourList.contains(hour)) {
+					List<UserProfile> userProfileList;
+
+					try {
+						userProfileList = userProfileService
+								.getRandomUserProfileList(0, userSize);
+					} catch (ServiceException e) {
+						logger.error("Exception", e);
+
+						throw new ActionException(e);
+					}
+
+					for (UserProfile userProfile : userProfileList) {
+						String userName = userProfile.getName();
+
+						logger.debug(
+								"Begin to globally add message, hostUserSn = {}, guestUserSn = {}",
+								userSn, userProfile.getSn());
+
+						try {
+							weiboHandler.addMessage(
+									globallyAddingMessagesDefaultHttpClient,
+									userName, "你好，" + userName + "。" + text);
+						} catch (HandlerException e) {
+							continue;
+						}
+
+						logger.debug(
+								"End to globally add message, hostUserSn = {}, guestUserSn = {}",
+								userSn, userProfile.getSn());
+
+						sleep();
+					}
+				}
+			}
+
+			try {
+				globallyAddingMessageOperatorService
+						.updateGloballyAddingMessageOperator(globallyAddingMessageOperator);
+			} catch (ServiceException e) {
+				logger.error("Exception", e);
+
+				throw new ActionException(e);
+			}
+		}
+	}
+
+	public void individuallyAddMessages() {
+		List<IndividuallyAddingMessageOperator> individuallyAddingMessageOperatorList;
+
+		try {
+			individuallyAddingMessageOperatorList = individuallyAddingMessageOperatorService
+					.getIndividuallyAddingMessageOperatorList();
+		} catch (ServiceException e) {
+			logger.error("Exception", e);
+
+			throw new ActionException(e);
+		}
+
+		for (IndividuallyAddingMessageOperator individuallyAddingMessageOperator : individuallyAddingMessageOperatorList) {
+			String userSn = individuallyAddingMessageOperator.getSn();
+
+			setCookies(individuallyAddingMessagesDefaultHttpClient,
+					individuallyAddingMessageOperator.getCookies());
+
+			try {
+				weiboHandler.login(individuallyAddingMessagesDefaultHttpClient);
+			} catch (HandlerException e) {
+				continue;
+			}
+
+			sleep();
+
+			String text = individuallyAddingMessageOperator.getText();
+
+			int userSize = individuallyAddingMessageOperator.getUserSize();
+
+			Date beginDate = individuallyAddingMessageOperator.getBeginDate();
+			Date endDate = individuallyAddingMessageOperator.getEndDate();
+			List<Integer> hourList = individuallyAddingMessageOperator
+					.getHourList();
+
+			Date now = new Date();
+
+			if (beginDate.before(now) && now.before(endDate)) {
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(now);
+
+				int hour = cal.get(Calendar.HOUR_OF_DAY);
+
+				if (hourList.contains(hour)) {
+					List<UserBase> userBaseList;
+
+					String userBaseTableName = individuallyAddingMessageOperator
+							.getUserBaseTableName();
+					int userBaseIndex = individuallyAddingMessageOperator
+							.getUserBaseIndex();
+
+					try {
+						userBaseList = userBaseService.getUserBaseList(
+								userBaseTableName, userBaseIndex, userSize);
+					} catch (ServiceException e) {
+						logger.error("Exception", e);
+
+						throw new ActionException(e);
+					}
+
+					for (UserBase userBase : userBaseList) {
+						String userName = userBase.getName();
+
+						logger.debug(
+								"Begin to individually add message, hostUserSn = {}, guestUserSn = {}",
+								userSn, userBase.getSn());
+
+						boolean successful = false;
+
+						for (int i = 0; i < 10; i++) {
+							try {
+								weiboHandler
+										.addMessage(
+												individuallyAddingMessagesDefaultHttpClient,
+												userName, "你好，" + userName
+														+ "。" + text);
+
+								successful = true;
+								break;
+							} catch (HandlerException e) {
+							}
+
+							sleep();
+						}
+
+						if (!successful) {
+							continue;
+						}
+
+						logger.debug(
+								"End to individually add message, hostUserSn = {}, guestUserSn = {}",
+								userSn, userBase.getSn());
+
+						sleep();
+					}
+
+					individuallyAddingMessageOperator
+							.setUserBaseIndex(userBaseIndex + userSize);
+				}
+			}
+
+			try {
+				individuallyAddingMessageOperatorService
+						.updateIndividuallyAddingMessageOperator(individuallyAddingMessageOperator);
+			} catch (ServiceException e) {
+				logger.error("Exception", e);
+
+				throw new ActionException(e);
+			}
+		}
+	}
+
+	public void globallyAddComments() {
+		List<GloballyAddingCommentOperator> globallyAddingCommentOperatorList;
+
+		try {
+			globallyAddingCommentOperatorList = globallyAddingCommentOperatorService
+					.getGloballyAddingCommentOperatorList();
+		} catch (ServiceException e) {
+			logger.error("Exception", e);
+
+			throw new ActionException(e);
+		}
+
+		for (GloballyAddingCommentOperator globallyAddingCommentOperator : globallyAddingCommentOperatorList) {
+			String userSn = globallyAddingCommentOperator.getSn();
+
+			setCookies(globallyAddingCommentsDefaultHttpClient,
+					globallyAddingCommentOperator.getCookies());
+
+			try {
+				weiboHandler.login(globallyAddingCommentsDefaultHttpClient);
+			} catch (HandlerException e) {
+				continue;
+			}
+
+			sleep();
+
+			String text = globallyAddingCommentOperator.getText();
+
+			int userSize = globallyAddingCommentOperator.getUserSize();
+
+			Date beginDate = globallyAddingCommentOperator.getBeginDate();
+			Date endDate = globallyAddingCommentOperator.getEndDate();
+			List<Integer> hourList = globallyAddingCommentOperator
+					.getHourList();
+
+			Date now = new Date();
+
+			if (beginDate.before(now) && now.before(endDate)) {
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(now);
+
+				int hour = cal.get(Calendar.HOUR_OF_DAY);
+
+				if (hourList.contains(hour)) {
+					List<UserProfile> userProfileList;
+
+					try {
+						userProfileList = userProfileService
+								.getRandomUserProfileList(0, userSize);
+					} catch (ServiceException e) {
+						logger.error("Exception", e);
+
+						throw new ActionException(e);
+					}
+
+					for (UserProfile userProfile : userProfileList) {
+						String userName = userProfile.getName();
+
+						logger.debug(
+								"Begin to globally add comment, hostUserSn = {}, guestUserSn = {}",
+								userSn, userProfile.getSn());
+
+						List<String> blogSnList = new ArrayList<>();
+
+						try {
+							blogSnList = weiboHandler.getBlogSnList(
+									globallyAddingCommentsDefaultHttpClient,
+									userProfile.getSn());
+						} catch (HandlerException e) {
+							continue;
+						}
+
+						sleep();
+
+						if (!blogSnList.isEmpty()) {
+							try {
+								weiboHandler
+										.addComment(
+												globallyAddingCommentsDefaultHttpClient,
+												blogSnList.get(0), "你好，"
+														+ userName + "。" + text);
+							} catch (HandlerException e) {
+								continue;
+							}
+						}
+
+						logger.debug(
+								"End to globally add comment, hostUserSn = {}, guestUserSn = {}",
+								userSn, userProfile.getSn());
+
+						sleep();
+					}
+				}
+			}
+
+			try {
+				globallyAddingCommentOperatorService
+						.updateGloballyAddingCommentOperator(globallyAddingCommentOperator);
+			} catch (ServiceException e) {
+				logger.error("Exception", e);
+
+				throw new ActionException(e);
+			}
+		}
+	}
+
+	public void individuallyAddComments() {
+		List<IndividuallyAddingCommentOperator> individuallyAddingCommentOperatorList;
+
+		try {
+			individuallyAddingCommentOperatorList = individuallyAddingCommentOperatorService
+					.getIndividuallyAddingCommentOperatorList();
+		} catch (ServiceException e) {
+			logger.error("Exception", e);
+
+			throw new ActionException(e);
+		}
+
+		for (IndividuallyAddingCommentOperator individuallyAddingCommentOperator : individuallyAddingCommentOperatorList) {
+			String userSn = individuallyAddingCommentOperator.getSn();
+
+			setCookies(individuallyAddingCommentsDefaultHttpClient,
+					individuallyAddingCommentOperator.getCookies());
+
+			try {
+				weiboHandler.login(individuallyAddingCommentsDefaultHttpClient);
+			} catch (HandlerException e) {
+				continue;
+			}
+
+			sleep();
+
+			String text = individuallyAddingCommentOperator.getText();
+
+			int userSize = individuallyAddingCommentOperator.getUserSize();
+
+			Date beginDate = individuallyAddingCommentOperator.getBeginDate();
+			Date endDate = individuallyAddingCommentOperator.getEndDate();
+			List<Integer> hourList = individuallyAddingCommentOperator
+					.getHourList();
+
+			Date now = new Date();
+
+			if (beginDate.before(now) && now.before(endDate)) {
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(now);
+
+				int hour = cal.get(Calendar.HOUR_OF_DAY);
+
+				if (hourList.contains(hour)) {
+					List<UserBase> userBaseList;
+
+					String userBaseTableName = individuallyAddingCommentOperator
+							.getUserBaseTableName();
+					int userBaseIndex = individuallyAddingCommentOperator
+							.getUserBaseIndex();
+
+					try {
+						userBaseList = userBaseService.getUserBaseList(
+								userBaseTableName, userBaseIndex, userSize);
+					} catch (ServiceException e) {
+						logger.error("Exception", e);
+
+						throw new ActionException(e);
+					}
+
+					for (UserBase userBase : userBaseList) {
+						String userName = userBase.getName();
+
+						logger.debug(
+								"Begin to individually add comment, hostUserSn = {}, guestUserSn = {}",
+								userSn, userBase.getSn());
+
+						boolean successful = false;
+
+						List<String> blogSnList = new ArrayList<>();
+
+						for (int i = 0; i < 10; i++) {
+							try {
+								blogSnList = weiboHandler
+										.getBlogSnList(
+												individuallyAddingCommentsDefaultHttpClient,
+												userBase.getSn());
+
+								successful = true;
+								break;
+							} catch (HandlerException e) {
+							}
+						}
+
+						if (!successful) {
+							continue;
+						}
+
+						sleep();
+
+						if (blogSnList.isEmpty()) {
+							continue;
+						}
+
+						for (int i = 0; i < 10; i++) {
+							try {
+								weiboHandler
+										.addComment(
+												individuallyAddingCommentsDefaultHttpClient,
+												blogSnList.get(0), "你好，"
+														+ userName + "。" + text);
+
+								successful = true;
+								break;
+							} catch (HandlerException e) {
+							}
+						}
+
+						if (!successful) {
+							continue;
+						}
+
+						logger.debug(
+								"End to individually add comment, hostUserSn = {}, guestUserSn = {}",
+								userSn, userBase.getSn());
+
+						sleep();
+					}
+
+					individuallyAddingCommentOperator
+							.setUserBaseIndex(userBaseIndex + userSize);
+				}
+			}
+
+			try {
+				individuallyAddingCommentOperatorService
+						.updateIndividuallyAddingCommentOperator(individuallyAddingCommentOperator);
+			} catch (ServiceException e) {
+				logger.error("Exception", e);
+
+				throw new ActionException(e);
+			}
 		}
 	}
 

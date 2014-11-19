@@ -45,4 +45,14 @@ public class UserProfileServiceImpl implements UserProfileService {
 		}
 	}
 
+	@Override
+	public List<UserProfile> getRandomUserProfileList(int index, int size)
+			throws ServiceException {
+		try {
+			return userProfileDao.getRandomUserProfileList(index, size);
+		} catch (DaoException e) {
+			throw new ServiceException(e);
+		}
+	}
+
 }

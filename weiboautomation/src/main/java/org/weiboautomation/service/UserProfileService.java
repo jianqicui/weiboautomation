@@ -15,4 +15,7 @@ public interface UserProfileService {
 	List<UserProfile> getUserProfileList(int index, int size)
 			throws ServiceException;
 
+	List<UserProfile> getRandomUserProfileList(int index, int size)
+			throws ServiceException;
+
 }

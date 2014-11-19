@@ -16,15 +16,15 @@ import org.apache.http.impl.cookie.BasicClientCookie;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class WeiboCookiesTest {
+public class WeiboConvertCookiesTest {
 
 	private ObjectMapper objectMapper;
 
-	public WeiboCookiesTest() {
+	public WeiboConvertCookiesTest() {
 		objectMapper = new ObjectMapper();
 	}
 
-	private void convert(String cookiesTextFile, String cookiesJsonFile)
+	private void convertCookies(String cookiesTextFile, String cookiesJsonFile)
 			throws Exception {
 		List<String> cookieStringList = FileUtils.readLines(new File(
 				cookiesTextFile), Charsets.UTF_8);
@@ -75,9 +75,10 @@ public class WeiboCookiesTest {
 		System.out.println("Input cookiesJsonFile: ");
 		String cookiesJsonFile = scanner.nextLine();
 
-		WeiboCookiesTest weiboCookiesTest = new WeiboCookiesTest();
+		WeiboConvertCookiesTest weiboConvertCookiesTest = new WeiboConvertCookiesTest();
 
-		weiboCookiesTest.convert(cookiesTextFile, cookiesJsonFile);
+		weiboConvertCookiesTest
+				.convertCookies(cookiesTextFile, cookiesJsonFile);
 	}
 
 }

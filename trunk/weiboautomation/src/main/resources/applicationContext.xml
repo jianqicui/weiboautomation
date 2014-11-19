@@ -168,6 +168,31 @@
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
 	</bean>
 
+	<bean id="userBaseDao"
+		class="org.weiboautomation.dao.jdbc.UserBaseJdbcDao">
+		<property name="jdbcTemplate" ref="jdbcTemplate" />
+	</bean>
+
+	<bean id="globallyAddingMessageOperatorDao"
+		class="org.weiboautomation.dao.jdbc.GloballyAddingMessageOperatorJdbcDao">
+		<property name="jdbcTemplate" ref="jdbcTemplate" />
+	</bean>
+
+	<bean id="individuallyAddingMessageOperatorDao"
+		class="org.weiboautomation.dao.jdbc.IndividuallyAddingMessageOperatorJdbcDao">
+		<property name="jdbcTemplate" ref="jdbcTemplate" />
+	</bean>
+	
+	<bean id="globallyAddingCommentOperatorDao"
+		class="org.weiboautomation.dao.jdbc.GloballyAddingCommentOperatorJdbcDao">
+		<property name="jdbcTemplate" ref="jdbcTemplate" />
+	</bean>
+	
+	<bean id="individuallyAddingCommentOperatorDao"
+		class="org.weiboautomation.dao.jdbc.IndividuallyAddingCommentOperatorJdbcDao">
+		<property name="jdbcTemplate" ref="jdbcTemplate" />
+	</bean>
+
 	<!-- Service -->
 	<bean id="ppTidTypeService" class="org.weiboautomation.service.impl.PpTidTypeServiceImpl">
 		<property name="ppTidTypeDao" ref="ppTidTypeDao" />
@@ -232,6 +257,31 @@
 	<bean id="transferingUserOperatorService"
 		class="org.weiboautomation.service.impl.TransferingUserOperatorServiceImpl">
 		<property name="transferingUserOperatorDao" ref="transferingUserOperatorDao" />
+	</bean>
+
+	<bean id="userBaseService"
+		class="org.weiboautomation.service.impl.UserBaseServiceImpl">
+		<property name="userBaseDao" ref="userBaseDao" />
+	</bean>
+
+	<bean id="globallyAddingMessageOperatorService"
+		class="org.weiboautomation.service.impl.GloballyAddingMessageOperatorServiceImpl">
+		<property name="globallyAddingMessageOperatorDao" ref="globallyAddingMessageOperatorDao" />
+	</bean>
+	
+	<bean id="individuallyAddingMessageOperatorService"
+		class="org.weiboautomation.service.impl.IndividuallyAddingMessageOperatorServiceImpl">
+		<property name="individuallyAddingMessageOperatorDao" ref="individuallyAddingMessageOperatorDao" />
+	</bean>
+	
+	<bean id="globallyAddingCommentOperatorService"
+		class="org.weiboautomation.service.impl.GloballyAddingCommentOperatorServiceImpl">
+		<property name="globallyAddingCommentOperatorDao" ref="globallyAddingCommentOperatorDao" />
+	</bean>
+	
+	<bean id="individuallyAddingCommentOperatorService"
+		class="org.weiboautomation.service.impl.IndividuallyAddingCommentOperatorServiceImpl">
+		<property name="individuallyAddingCommentOperatorDao" ref="individuallyAddingCommentOperatorDao" />
 	</bean>
 
 	<!-- Handler -->
@@ -306,13 +356,15 @@
 			<value>10000</value>
 		</property>
 		<property name="timinglyPublishingBlogOperatorService" ref="timinglyPublishingBlogOperatorService" />
-		<property name="timinglyPublishingBlogSize">
-			<value>1</value>
-		</property>
+		<property name="userBaseService" ref="userBaseService" />
+		<property name="globallyAddingMessageOperatorService" ref="globallyAddingMessageOperatorService" />
+		<property name="individuallyAddingMessageOperatorService" ref="individuallyAddingMessageOperatorService" />
+		<property name="globallyAddingCommentOperatorService" ref="globallyAddingCommentOperatorService" />
+		<property name="individuallyAddingCommentOperatorService" ref="individuallyAddingCommentOperatorService" />
 	</bean>
 
 	<!-- Task -->
-	<task:scheduler id="scheduler" pool-size="10" />
+	<task:scheduler id="scheduler" pool-size="20" />
 	<task:scheduled-tasks scheduler="scheduler">
 		<task:scheduled ref="weiboAutomationAction" method="collectBlogs"
 			fixed-delay="60000" />
@@ -333,6 +385,14 @@
 			fixed-delay="60000" />
 		<task:scheduled ref="weiboAutomationAction" method="transferUsers"
 			fixed-delay="60000" />
+		<task:scheduled ref="weiboAutomationAction" method="globallyAddMessages"
+			cron="0 0 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23 * * ?" />
+		<task:scheduled ref="weiboAutomationAction" method="individuallyAddMessages"
+			cron="0 0 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23 * * ?" />
+		<task:scheduled ref="weiboAutomationAction" method="globallyAddComments"
+			cron="0 0 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23 * * ?" />
+		<task:scheduled ref="weiboAutomationAction" method="individuallyAddComments"
+			cron="0 0 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23 * * ?" />
 	</task:scheduled-tasks>
 
 </beans>

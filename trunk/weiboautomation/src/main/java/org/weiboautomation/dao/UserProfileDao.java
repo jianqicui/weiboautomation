@@ -15,4 +15,7 @@ public interface UserProfileDao {
 	List<UserProfile> getUserProfileList(int index, int size)
 			throws DaoException;
 
+	List<UserProfile> getRandomUserProfileList(int index, int size)
+			throws DaoException;
+
 }

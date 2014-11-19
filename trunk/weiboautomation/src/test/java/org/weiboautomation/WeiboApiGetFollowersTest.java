@@ -31,7 +31,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
-public class FollowersTest {
+public class WeiboApiGetFollowersTest {
 
 	private static final Pattern accessTokenPattern = Pattern
 			.compile("2\\.00(.{28})");
@@ -40,7 +40,7 @@ public class FollowersTest {
 
 	private DefaultHttpClient defaultHttpClient;
 
-	public FollowersTest() {
+	public WeiboApiGetFollowersTest() {
 		objectMapper = new ObjectMapper();
 
 		defaultHttpClient = new DefaultHttpClient();
@@ -226,7 +226,6 @@ public class FollowersTest {
 		int i = 0;
 
 		for (String sn : snSet) {
-
 			if (i != snSet.size() - 1) {
 				sql.append("('" + sn + "'),");
 				sql.append("\n");
@@ -263,10 +262,10 @@ public class FollowersTest {
 		System.out.println("Input table name: ");
 		String tableName = scanner.nextLine();
 
-		FollowersTest followersTest = new FollowersTest();
+		WeiboApiGetFollowersTest weiboApiGetFollowersTest = new WeiboApiGetFollowersTest();
 
-		followersTest.getFollowers(cookiesFile, followersFile, usersFile,
-				tableName);
+		weiboApiGetFollowersTest.getFollowers(cookiesFile, followersFile,
+				usersFile, tableName);
 	}
 
 }

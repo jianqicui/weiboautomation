@@ -68,14 +68,14 @@ public class WeiboApiGetFollowersTest {
 			String value = (String) map.get("value");
 			String path = (String) map.get("path");
 			String comment = (String) map.get("comment");
-			int version = (int) map.get("version");
+			int version = (Integer) map.get("version");
 			String domain = (String) map.get("domain");
-			boolean secure = (boolean) map.get("secure");
+			boolean secure = (Boolean) map.get("secure");
 
 			Date expiryDate = null;
 
 			if (map.get("expiryDate") != null) {
-				expiryDate = new Date((long) map.get("expiryDate"));
+				expiryDate = new Date((Long) map.get("expiryDate"));
 			}
 
 			BasicClientCookie basicClientCookie = new BasicClientCookie(name,

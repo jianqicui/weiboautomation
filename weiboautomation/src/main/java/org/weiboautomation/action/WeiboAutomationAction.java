@@ -664,12 +664,12 @@ public class WeiboAutomationAction {
 
 			Date expiryDate = null;
 			if (map.get("expiryDate") != null) {
-				expiryDate = new Date((long) map.get("expiryDate"));
+				expiryDate = new Date((Long) map.get("expiryDate"));
 			}
 
 			String path = (String) map.get("path");
-			boolean secure = (boolean) map.get("secure");
-			int version = (int) map.get("version");
+			boolean secure = (Boolean) map.get("secure");
+			int version = (Integer) map.get("version");
 
 			BasicClientCookie basicClientCookie = new BasicClientCookie(name,
 					value);
@@ -1541,8 +1541,8 @@ public class WeiboAutomationAction {
 				List<User> userList;
 
 				try {
-					userList = userService.getUserList(typeCode,
-							UserPhase.filtered, followingUserIndex, 200);
+					userList = userService.getUserList(UserPhase.filtered,
+							followingUserIndex, 200);
 				} catch (ServiceException e) {
 					logger.error("Exception", e);
 
@@ -1556,6 +1556,8 @@ public class WeiboAutomationAction {
 					weiboHandler
 							.login(followingUsersIndividuallyDefaultHttpClient);
 				} catch (HandlerException e) {
+					logger.error("Exception", e);
+					
 					continue;
 				}
 
@@ -1567,9 +1569,11 @@ public class WeiboAutomationAction {
 					accessToken = weiboApiHandler
 							.getAccessToken(followingUsersIndividuallyDefaultHttpClient);
 				} catch (HandlerException e) {
+					logger.error("Exception", e);
+					
 					continue;
 				}
-
+				
 				sleep();
 
 				Map<String, Integer> blogSizeMap;
@@ -2329,7 +2333,7 @@ public class WeiboAutomationAction {
 								"Begin to globally add comment, hostUserSn = {}, guestUserSn = {}",
 								userSn, userProfile.getSn());
 
-						List<String> blogSnList = new ArrayList<>();
+						List<String> blogSnList = new ArrayList<String>();
 
 						try {
 							blogSnList = weiboHandler.getBlogSnList(
@@ -2442,7 +2446,7 @@ public class WeiboAutomationAction {
 
 						boolean successful = false;
 
-						List<String> blogSnList = new ArrayList<>();
+						List<String> blogSnList = new ArrayList<String>();
 
 						for (int i = 0; i < 10; i++) {
 							try {

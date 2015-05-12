@@ -36,7 +36,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class WeiboApiPublishBlogTest {
 
 	private static final Pattern locationReplacePattern = Pattern
-			.compile("location.replace\\('.*'\\)");
+			.compile("location.replace\\(.*\\)");
 
 	private ObjectMapper objectMapper;
 	private DefaultHttpClient defaultHttpClient;
@@ -72,12 +72,12 @@ public class WeiboApiPublishBlogTest {
 
 			Date expiryDate = null;
 			if (map.get("expiryDate") != null) {
-				expiryDate = new Date((long) map.get("expiryDate"));
+				expiryDate = new Date((Long) map.get("expiryDate"));
 			}
 
 			String path = (String) map.get("path");
-			boolean secure = (boolean) map.get("secure");
-			int version = (int) map.get("version");
+			boolean secure = (Boolean) map.get("secure");
+			int version = (Integer) map.get("version");
 
 			BasicClientCookie basicClientCookie = new BasicClientCookie(name,
 					value);

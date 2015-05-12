@@ -368,7 +368,7 @@ public class WeiboApiHandler {
 		}
 
 		if (arrayNode != null) {
-			List<String> tagList = new ArrayList<>();
+			List<String> tagList = new ArrayList<String>();
 
 			for (JsonNode jsonNode : arrayNode) {
 				Map.Entry<String, JsonNode> map = jsonNode.fields().next();

@@ -34,7 +34,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class WeiboHandler {
 
 	private static final Pattern locationReplacePattern = Pattern
-			.compile("location.replace\\('.*'\\)");
+			.compile("location.replace\\(.*\\)");
 
 	private ObjectMapper objectMapper;
 

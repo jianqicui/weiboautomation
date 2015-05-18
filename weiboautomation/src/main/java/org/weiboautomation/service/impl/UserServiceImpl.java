@@ -37,6 +37,16 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
+	public List<User> getRandomUserList(UserPhase userPhase, int index, int size)
+			throws ServiceException {
+		try {
+			return userDao.getRandomUserList(userPhase, index, size);
+		} catch (DaoException e) {
+			throw new ServiceException(e);
+		}
+	}
+
+	@Override
 	public boolean isSameUserExisting(UserPhase userPhase, User user)
 			throws ServiceException {
 		try {

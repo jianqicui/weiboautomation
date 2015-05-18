@@ -43,3 +43,9 @@ create table type13_operator_blog_publishing_timingly (
   	hours varchar(100) not null,
   	primary key (id)
 );
+
+create table type13_operator_micro_task_publishing (
+	id int not null auto_increment,
+  	cookies text not null,
+  	primary key (id)
+);

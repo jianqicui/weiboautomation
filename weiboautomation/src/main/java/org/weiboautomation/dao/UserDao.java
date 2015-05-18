@@ -13,6 +13,9 @@ public interface UserDao {
 	List<User> getUserList(UserPhase userPhase, int index, int size)
 			throws DaoException;
 
+	List<User> getRandomUserList(UserPhase userPhase, int index, int size)
+			throws DaoException;
+
 	boolean isSameUserExisting(UserPhase userPhase, User user)
 			throws DaoException;
 

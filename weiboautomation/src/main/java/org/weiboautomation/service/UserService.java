@@ -13,6 +13,9 @@ public interface UserService {
 	List<User> getUserList(UserPhase userPhase, int index, int size)
 			throws ServiceException;
 
+	List<User> getRandomUserList(UserPhase userPhase, int index, int size)
+			throws ServiceException;
+
 	boolean isSameUserExisting(UserPhase userPhase, User user)
 			throws ServiceException;
 

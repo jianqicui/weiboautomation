@@ -67,6 +67,19 @@ public class UserJdbcDao implements UserDao {
 	}
 
 	@Override
+	public List<User> getRandomUserList(UserPhase userPhase, int index, int size)
+			throws DaoException {
+		String sql = "select id, sn from " + getTableName(userPhase)
+				+ " order by rand() limit ?, ?";
+
+		try {
+			return jdbcTemplate.query(sql, rowMapper, index, size);
+		} catch (Exception e) {
+			throw new DaoException(e);
+		}
+	}
+
+	@Override
 	public boolean isSameUserExisting(UserPhase userPhase, User user)
 			throws DaoException {
 		String sql = "select count(*) from " + getTableName(userPhase)

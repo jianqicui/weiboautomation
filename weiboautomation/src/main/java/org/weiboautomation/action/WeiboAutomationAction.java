@@ -1780,7 +1780,7 @@ public class WeiboAutomationAction {
 
 					}
 
-					// sleep();
+					sleep();
 
 					userSize++;
 
@@ -1884,7 +1884,7 @@ public class WeiboAutomationAction {
 						continue;
 					}
 
-					// sleep();
+					sleep();
 
 					userSize++;
 
@@ -2176,7 +2176,6 @@ public class WeiboAutomationAction {
 
 			sleep();
 			
-			/*
 			SaeStorage saeStorage;
 
 			try {
@@ -2199,7 +2198,6 @@ public class WeiboAutomationAction {
 			}
 
 			sleep();
-			*/
 
 			logger.debug(
 					"End to transfer users, beginUserIndex = {}, endUserIndex = {}",

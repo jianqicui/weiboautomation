@@ -726,18 +726,6 @@ public class WeiboAutomationAction {
 	}
 
 	public void transferBlogs() {
-		SaeStorage saeStorage;
-
-		try {
-			saeStorage = saeStorageHandler.getSaeStorage(
-					transferingBlogsDefaultHttpClient, saeStorageAccessKey,
-					saeStorageSecretKey);
-		} catch (HandlerException e) {
-			return;
-		}
-
-		sleep();
-
 		List<Type> typeList;
 
 		try {
@@ -786,6 +774,18 @@ public class WeiboAutomationAction {
 				weiboHandler.login(transferingBlogsDefaultHttpClient);
 			} catch (HandlerException e) {
 				continue;
+			}
+
+			sleep();
+
+			SaeStorage saeStorage;
+
+			try {
+				saeStorage = saeStorageHandler.getSaeStorage(
+						transferingBlogsDefaultHttpClient, saeStorageAccessKey,
+						saeStorageSecretKey);
+			} catch (HandlerException e) {
+				return;
 			}
 
 			sleep();
@@ -2074,18 +2074,6 @@ public class WeiboAutomationAction {
 	}
 
 	public void transferUsers() {
-		SaeStorage saeStorage;
-
-		try {
-			saeStorage = saeStorageHandler.getSaeStorage(
-					transferingUsersDefaultHttpClient, saeStorageAccessKey,
-					saeStorageSecretKey);
-		} catch (HandlerException e) {
-			return;
-		}
-
-		sleep();
-
 		TransferingUserOperator transferingUserOperator;
 
 		try {
@@ -2182,6 +2170,18 @@ public class WeiboAutomationAction {
 			try {
 				vdiskHandler.addBytes(transferingUsersDefaultHttpClient,
 						userProfilesBytes, destFile);
+			} catch (HandlerException e) {
+				return;
+			}
+
+			sleep();
+			
+			SaeStorage saeStorage;
+
+			try {
+				saeStorage = saeStorageHandler.getSaeStorage(
+						transferingUsersDefaultHttpClient, saeStorageAccessKey,
+						saeStorageSecretKey);
 			} catch (HandlerException e) {
 				return;
 			}

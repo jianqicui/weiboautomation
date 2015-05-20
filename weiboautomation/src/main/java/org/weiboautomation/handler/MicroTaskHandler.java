@@ -1,13 +1,9 @@
 package org.weiboautomation.handler;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.io.Charsets;
 import org.apache.commons.lang3.time.DateFormatUtils;
@@ -19,7 +15,6 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.jsoup.Jsoup;
@@ -30,9 +25,6 @@ import org.weiboautomation.entity.MicroTask;
 import org.weiboautomation.handler.exception.HandlerException;
 
 public class MicroTaskHandler {
-
-	private static final Pattern locationReplacePattern = Pattern
-			.compile("location.replace\\(.*\\)");
 
 	private String get(HttpClient httpClient, String url)
 			throws HandlerException {
@@ -60,39 +52,6 @@ public class MicroTaskHandler {
 		}
 
 		return result;
-	}
-
-	public void login(HttpClient httpClient) throws HandlerException {
-		URI uri;
-
-		try {
-			uri = new URIBuilder().setScheme("http")
-					.setHost("login.sina.com.cn").setPath("/sso/login.php")
-					.setParameter("url", "http://weibo.com/")
-					.addParameter("gateway", "1")
-					.setParameter("service", "miniblog")
-					.setParameter("entry", "miniblog")
-					.setParameter("useticket", "1")
-					.setParameter("returntype", "META").build();
-		} catch (URISyntaxException e) {
-			throw new HandlerException(e);
-		}
-
-		String result = get(httpClient, uri.toString());
-
-		Matcher matcher = locationReplacePattern.matcher(result);
-
-		String url;
-
-		if (matcher.find()) {
-			result = matcher.group();
-
-			url = result.substring(18, result.length() - 2);
-		} else {
-			throw new HandlerException("Login failed");
-		}
-
-		get(httpClient, url);
 	}
 
 	public void weiboAuth(HttpClient httpClient) throws HandlerException {

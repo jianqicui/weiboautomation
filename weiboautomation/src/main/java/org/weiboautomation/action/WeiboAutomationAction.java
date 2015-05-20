@@ -1173,8 +1173,7 @@ public class WeiboAutomationAction {
 						publishingMicroTaskOperator.getCookies());
 
 				try {
-					microTaskHandler
-							.login(publishingMicroTasksDefaultHttpClient);
+					weiboHandler.login(publishingMicroTasksDefaultHttpClient);
 				} catch (HandlerException e) {
 					continue;
 				}
@@ -1227,11 +1226,11 @@ public class WeiboAutomationAction {
 					continue;
 				}
 
+				sleep();
+
 				logger.debug(
 						"End to publish micro task, typeCode = {}, id = {}",
 						typeCode, microTaskId);
-
-				sleep();
 
 				publishingMicroTaskOperator
 						.setCookies(getCookies(publishingMicroTasksDefaultHttpClient));
@@ -2175,7 +2174,7 @@ public class WeiboAutomationAction {
 			}
 
 			sleep();
-			
+
 			SaeStorage saeStorage;
 
 			try {

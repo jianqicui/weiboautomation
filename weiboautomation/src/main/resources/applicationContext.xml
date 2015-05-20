@@ -312,7 +312,7 @@
 
 	<!-- Action -->
 	<bean id="weiboAutomationAction" class="org.weiboautomation.action.WeiboAutomationAction"
-		init-method="initialize">
+		init-method="initialize" destroy-method="destroy">
 		<property name="ppHandler" ref="ppHandler" />
 		<property name="ppUsername">
 			<value>${pp.username}</value>

@@ -1226,11 +1226,11 @@ public class WeiboAutomationAction {
 					continue;
 				}
 
-				sleep();
-
 				logger.debug(
 						"End to publish micro task, typeCode = {}, id = {}",
 						typeCode, microTaskId);
+
+				sleep();
 
 				publishingMicroTaskOperator
 						.setCookies(getCookies(publishingMicroTasksDefaultHttpClient));
